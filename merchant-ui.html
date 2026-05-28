@@ -40,6 +40,18 @@
       color:#374151;
     }
     .svc-btn:hover { background:#e0f2fe; border-color:#7dd3fc; color:#0c4a6e; }
+    .trace-list { list-style:none; display:grid; gap:6px; margin-top:8px; max-height:220px; overflow:auto; }
+    .trace-item { border:1px solid #e5e7eb; border-radius:8px; padding:7px; background:#fff; font-size:11px; }
+    .trace-item .title { font-weight:700; color:#111827; margin-bottom:3px; }
+    .trace-item code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size:10px;
+      background:#eef2f7;
+      border-radius:5px;
+      padding:1px 5px;
+      display:inline-block;
+      margin:2px 3px 0 0;
+    }
     .screen { border:2px dashed #c7c9d1; border-radius:12px; background:#fff; padding:12px; }
     .tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
     .tag { border:1px solid var(--line); border-radius:999px; padding:3px 8px; font-size:10px; background:#fafafa; }
@@ -163,6 +175,7 @@
       <section class="panel">
         <h3>تعامل کاربر (Log)</h3>
         <div id="log" class="live-note">هنوز تعاملی انجام نشده.</div>
+        <ul id="serviceTraceList" class="trace-list"></ul>
       </section>
       <section class="panel">
         <h3>سرویس‌های استفاده‌شده در این حالت</h3>
@@ -180,7 +193,7 @@
   </div>
 
   <script>
-    const state = { page: "pdp", level: "0", trust: "trusted", finalization: "at", selectedMethod: "fourpay" };
+    const state = { page: "pdp", level: "0", trust: "trusted", finalization: "at", selectedMethod: "fourpay", serviceTrace: [] };
     const servicesByPage = {
       pdp: ["GetUserLevel","GetPaymentOptions(amount)","Get4PayFormulaBreakdown","CreateCreditApplicationSession","CreateRepaymentSession"],
       plp: ["GetUserLevel","BatchPaymentOptions(items[])","GetInstallmentPreviewLite","CreateCreditApplicationSession","CreateRepaymentSession"],
@@ -194,6 +207,30 @@
       at: ["ConfirmPayment + PaymentWebhooks"],
       after: ["AuthorizeAmount (after-checkout)","CaptureFinalAmount (after-checkout)","AdjustOrVoidAuthorization (after-checkout)"]
     };
+    function addTrace(title, services){
+      state.serviceTrace.unshift({ title, services:[...new Set(services)] });
+      state.serviceTrace = state.serviceTrace.slice(0, 20);
+      renderTrace();
+    }
+    function renderTrace(){
+      const el = byId("serviceTraceList");
+      if (!el) return;
+      if (!state.serviceTrace.length) {
+        el.innerHTML = `<li class="trace-item"><div class="title">ردیابی سرویس‌ها</div><div>در هر تعامل، سرویس‌های استفاده‌شده اینجا نمایش داده می‌شوند.</div></li>`;
+        return;
+      }
+      el.innerHTML = state.serviceTrace.map(t => `<li class="trace-item"><div class="title">${t.title}</div><div>${t.services.map(s=>`<code>${s}</code>`).join("")}</div></li>`).join("");
+    }
+    function baseContextServices(){
+      const list = ["GetUserLevel"];
+      if (state.page==="pdp") list.push("GetPaymentOptions(amount)");
+      if (state.page==="plp") list.push("BatchPaymentOptions(items[])","GetInstallmentPreviewLite");
+      if (state.page==="checkout") list.push("CreateCheckoutSession","GetPaymentOptionsForCheckout");
+      if (state.trust==="trusted") list.push("GetBalanceAndDebt (trusted only)","GetCreditHeadroom (trusted only)");
+      else list.push("GetEligibilityFlagsOnly (untrusted only)");
+      if (state.finalization==="after" && state.page==="checkout") list.push("AuthorizeAmount (after-checkout)");
+      return list;
+    }
     const byId = (id) => document.getElementById(id);
     function log(msg){ byId("log").textContent = msg; }
     function levelText() { return state.level === "0" ? "L0: بدون اعتبار" : state.level === "1" ? "L1: دارای اعتبار" : "L2: دارای بدهی"; }
@@ -286,28 +323,35 @@
     }
 
     function bindInteractions(){
-      document.querySelectorAll("[data-card]").forEach(c=>c.addEventListener("click",()=>{ state.page="pdp"; activate("pageBtns","pdp"); draw(); log("کاربر از PLP وارد PDP شد."); }));
+      document.querySelectorAll("[data-card]").forEach(c=>c.addEventListener("click",()=>{ state.page="pdp"; activate("pageBtns","pdp"); draw(); log("کاربر از PLP وارد PDP شد."); addTrace("ورود از PLP به PDP", ["GetUserLevel","GetPaymentOptions(amount)"]); }));
       document.querySelectorAll("[data-method]").forEach(m=>{
         const locked = m.classList.contains("lock");
         m.addEventListener("click",()=>{
           if (locked) { log("این روش فعلاً قفل است."); return; }
           state.selectedMethod = m.dataset.method; draw(); log(`روش پرداخت انتخاب شد: ${state.selectedMethod}`);
-          if (state.selectedMethod === "fourpay") log("جزئیات اقساط ۴پی نمایش داده شد.");
+          if (state.selectedMethod === "fourpay") { log("جزئیات اقساط ۴پی نمایش داده شد."); addTrace("انتخاب 4pay", ["SelectPaymentMethod","Get4PayFormulaBreakdown"]); }
+          else addTrace("انتخاب روش پرداخت", ["SelectPaymentMethod"]);
         });
       });
-      const apply = byId("applyBtn"); if (apply) apply.addEventListener("click",()=>{ state.level="1"; activate("levelBtns","1"); draw(); log("درخواست اعتبار تکمیل شد -> کاربر وارد Level 1 شد."); });
-      const repay = byId("repayBtn"); if (repay) repay.addEventListener("click",()=>{ state.level="1"; activate("levelBtns","1"); draw(); log("بدهی تسویه شد -> اعتبار باز شد (Level 1)."); });
-      const checkout = byId("gotoCheckoutBtn"); if (checkout) checkout.addEventListener("click",()=>{ state.page="checkout"; activate("pageBtns","checkout"); draw(); log("کاربر از PDP وارد checkout شد."); });
-      const fast = byId("fastBtn"); if (fast) fast.addEventListener("click",()=>{ state.page="checkout"; state.selectedMethod="onepay"; activate("pageBtns","checkout"); draw(); log("خرید سریع 1pay انتخاب شد."); });
+      const apply = byId("applyBtn"); if (apply) apply.addEventListener("click",()=>{ state.level="1"; activate("levelBtns","1"); draw(); log("درخواست اعتبار تکمیل شد -> کاربر وارد Level 1 شد."); addTrace("درخواست اعتبار", ["CreateCreditApplicationSession","GetUserLevel","GetPaymentOptions(amount)"]); });
+      const repay = byId("repayBtn"); if (repay) repay.addEventListener("click",()=>{ state.level="1"; activate("levelBtns","1"); draw(); log("بدهی تسویه شد -> اعتبار باز شد (Level 1)."); addTrace("تسویه بدهی", ["CreateRepaymentSession","GetUserLevel","GetPaymentOptionsForCheckout"]); });
+      const checkout = byId("gotoCheckoutBtn"); if (checkout) checkout.addEventListener("click",()=>{ state.page="checkout"; activate("pageBtns","checkout"); draw(); log("کاربر از PDP وارد checkout شد."); addTrace("لود checkout", ["CreateCheckoutSession","GetPaymentOptionsForCheckout"]); });
+      const fast = byId("fastBtn"); if (fast) fast.addEventListener("click",()=>{ state.page="checkout"; state.selectedMethod="onepay"; activate("pageBtns","checkout"); draw(); log("خرید سریع 1pay انتخاب شد."); addTrace("خرید سریع 1pay", ["CreateCheckoutSession","GetPaymentOptionsForCheckout","SelectPaymentMethod"]); });
       const addToCart = byId("addToCartBtn"); if (addToCart) addToCart.addEventListener("click",()=>log("محصول به سبد خرید اضافه شد."));
-      const wallet = byId("walletBtn"); if (wallet) wallet.addEventListener("click",()=>{ state.page="checkout"; state.selectedMethod="wallet"; activate("pageBtns","checkout"); draw(); log("پرداخت با کیف پول انتخاب شد."); });
+      const wallet = byId("walletBtn"); if (wallet) wallet.addEventListener("click",()=>{ state.page="checkout"; state.selectedMethod="wallet"; activate("pageBtns","checkout"); draw(); log("پرداخت با کیف پول انتخاب شد."); addTrace("ورود checkout با کیف پول", ["CreateCheckoutSession","GetPaymentOptionsForCheckout","SelectPaymentMethod"]); });
       const confirm = byId("confirmBtn");
       if (confirm) confirm.addEventListener("click",()=>{
         const msg = byId("resultMsg");
         if (!msg) return;
-        if (state.level==="0" && (state.selectedMethod==="fourpay"||state.selectedMethod==="onepay")) msg.textContent = "برای این روش ابتدا باید اعتبار را فعال کنید.";
-        else if (state.level==="2" && (state.selectedMethod==="fourpay"||state.selectedMethod==="onepay")) msg.textContent = "ابتدا بدهی را تسویه کنید، سپس پرداخت اعتباری ممکن می‌شود.";
-        else msg.textContent = `پرداخت با ${state.selectedMethod} انجام شد (شبیه‌سازی).`;
+        if (state.level==="0" && (state.selectedMethod==="fourpay"||state.selectedMethod==="onepay")) { msg.textContent = "برای این روش ابتدا باید اعتبار را فعال کنید."; addTrace("تلاش پرداخت اعتباری در L0", ["GetUserLevel","CreateCreditApplicationSession"]); }
+        else if (state.level==="2" && (state.selectedMethod==="fourpay"||state.selectedMethod==="onepay")) { msg.textContent = "ابتدا بدهی را تسویه کنید، سپس پرداخت اعتباری ممکن می‌شود."; addTrace("تلاش پرداخت اعتباری در L2", ["GetUserLevel","CreateRepaymentSession"]); }
+        else {
+          msg.textContent = `پرداخت با ${state.selectedMethod} انجام شد (شبیه‌سازی).`;
+          const flow = ["ConfirmPayment + PaymentWebhooks"];
+          if (state.selectedMethod==="wallet" || state.selectedMethod==="fourpay") flow.unshift("InitiateIPGUplift + OTPChallenge");
+          if (state.finalization==="after") flow.unshift("CaptureFinalAmount (after-checkout)");
+          addTrace("تایید نهایی پرداخت", flow);
+        }
       });
     }
 
@@ -325,6 +369,8 @@
       else screen.innerHTML = renderCheckout();
       renderServiceUsedList();
       bindInteractions();
+      if (!state.serviceTrace.length) addTrace("لود صفحه", baseContextServices());
+      else renderTrace();
     }
 
     function renderServiceUsedList(){
@@ -350,10 +396,10 @@
       });
     }
 
-    document.querySelectorAll("#pageBtns .btn").forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll("#pageBtns .btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); state.page=b.dataset.page; draw(); }));
-    document.querySelectorAll("#levelBtns .btn").forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll("#levelBtns .btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); state.level=b.dataset.level; draw(); }));
-    document.querySelectorAll("#trustBtns .btn").forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll("#trustBtns .btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); state.trust=b.dataset.trust; draw(); }));
-    document.querySelectorAll("#finalBtns .btn").forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll("#finalBtns .btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); state.finalization=b.dataset.final; draw(); }));
+    document.querySelectorAll("#pageBtns .btn").forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll("#pageBtns .btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); state.page=b.dataset.page; draw(); addTrace("تغییر صفحه", baseContextServices()); }));
+    document.querySelectorAll("#levelBtns .btn").forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll("#levelBtns .btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); state.level=b.dataset.level; draw(); addTrace("تغییر سطح کاربر", baseContextServices()); }));
+    document.querySelectorAll("#trustBtns .btn").forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll("#trustBtns .btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); state.trust=b.dataset.trust; draw(); addTrace("تغییر حالت اعتماد", baseContextServices()); }));
+    document.querySelectorAll("#finalBtns .btn").forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll("#finalBtns .btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); state.finalization=b.dataset.final; draw(); addTrace("تغییر نوع نهایی‌سازی مبلغ", baseContextServices()); }));
     draw();
   </script>
 </body>
