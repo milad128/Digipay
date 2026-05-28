@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digipay Merchant Services Documentation (More Code)</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --line: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --brand: #0ea5e9;
+      --brand-soft: #e0f2fe;
+      --ok-soft: #ecfdf5;
+      --warn-soft: #fff7ed;
+      --code-bg: #0b1220;
+      --code-fg: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .container { max-width: 1360px; margin: 0 auto; padding: 20px; }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    h1 { font-size: 28px; margin-bottom: 4px; }
+    .sub { color: var(--muted); font-size: 14px; max-width: 860px; }
+    .btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 12px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .layout { display: grid; grid-template-columns: 300px 1fr; gap: 14px; }
+    .side, .content-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .side h3 { font-size: 13px; margin-bottom: 8px; }
+    .side ul { list-style: none; display: grid; gap: 6px; }
+    .side li {
+      font-size: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 7px 8px;
+      background: #fcfdff;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .mini {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      background: #fff;
+    }
+    .mini h4 { font-size: 12px; margin-bottom: 5px; }
+    .mini p { font-size: 11px; color: var(--muted); }
+    .section-title { font-size: 18px; margin: 18px 0 10px; }
+    .service {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: #fff;
+      margin-bottom: 10px;
+    }
+    .service-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .service h4 { font-size: 14px; }
+    .badge {
+      font-size: 11px;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-weight: 700;
+      background: var(--brand-soft);
+      color: #0369a1;
+    }
+    .kv {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 8px;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .kv strong { color: #111827; }
+    .code {
+      margin-top: 6px;
+      background: var(--code-bg);
+      color: var(--code-fg);
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 11px;
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .box {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      background: #fff;
+    }
+    .box h5 { font-size: 12px; margin-bottom: 6px; }
+    .box ul { padding-left: 17px; }
+    .box li { font-size: 11px; color: #334155; margin-bottom: 4px; }
+    .pm-note {
+      background: var(--warn-soft);
+      border: 1px solid #fed7aa;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 12px;
+      color: #9a3412;
+      margin-top: 8px;
+    }
+    .eng-note {
+      background: var(--ok-soft);
+      border: 1px solid #86efac;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 12px;
+      color: #166534;
+      margin-top: 8px;
+    }
+    .info {
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 12px;
+      color: #3730a3;
+      margin-top: 10px;
+    }
+    @media (max-width: 1080px) {
+      .layout { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top">
+      <div>
+        <h1>Digipay Merchant Services Documentation</h1>
+        <p class="sub">
+          Scope: <strong>More Code segment</strong>, Digikala-like UX theme, pages: PDP / PLP / Checkout, and user levels L0 / L1 / L2.
+          This document includes service catalog, API contracts, UX usage, implementation sequence, and product notes.
+        </p>
+      </div>
+      <a class="btn" href="wireframe-morecode-fa.html">← Back to wireframe</a>
+    </div>
+
+    <div class="layout">
+      <aside class="side">
+        <h3>Service Catalog (used in wireframe)</h3>
+        <ul>
+          <li>GetUserLevel</li>
+          <li>GetPaymentOptions(amount)</li>
+          <li>Get4PayFormulaBreakdown</li>
+          <li>CreateCreditApplicationSession</li>
+          <li>CreateRepaymentSession</li>
+          <li>BatchPaymentOptions(items[])</li>
+          <li>GetInstallmentPreviewLite</li>
+          <li>CreateCheckoutSession</li>
+          <li>GetPaymentOptionsForCheckout</li>
+          <li>SelectPaymentMethod</li>
+          <li>InitiateIPGUplift</li>
+          <li>OTPChallenge</li>
+          <li>ConfirmPayment</li>
+          <li>PaymentWebhooks</li>
+          <li>GetBalanceAndDebt (trusted only)</li>
+          <li>GetCreditHeadroom (trusted only)</li>
+          <li>GetEligibilityFlagsOnly (untrusted only)</li>
+          <li>AuthorizeAmount (after-checkout)</li>
+          <li>CaptureFinalAmount (after-checkout)</li>
+          <li>AdjustOrVoidAuthorization (after-checkout)</li>
+        </ul>
+      </aside>
+
+      <main>
+        <section class="content-card">
+          <div class="info" id="contextInfo">
+            Selected context from wireframe: page / level / trust / finalization will appear here.
+          </div>
+          <div class="summary-grid">
+            <div class="mini">
+              <h4>Product View</h4>
+              <p>Services are grouped by page and mapped to level-specific UX actions.</p>
+            </div>
+            <div class="mini">
+              <h4>Engineering View</h4>
+              <p>Each service includes endpoint contract + required call order + FE/BE ownership.</p>
+            </div>
+            <div class="mini">
+              <h4>Risk & Policy View</h4>
+              <p>Trusted vs not-trusted behavior and repayment lock logic are embedded per service.</p>
+            </div>
+          </div>
+
+          <h2 class="section-title">BNPL UX Best Practices Applied</h2>
+          <div class="grid-2">
+            <div class="box">
+              <h5>Klarna / Stripe style</h5>
+              <ul>
+                <li>Transparent installment breakdown before commitment</li>
+                <li>Server-authoritative pricing and due-dates (no client math)</li>
+                <li>Recoverable checkout sessions + idempotent APIs</li>
+              </ul>
+            </div>
+            <div class="box">
+              <h5>Afterpay / leading BNPL style</h5>
+              <ul>
+                <li>Strong level-based CTAs: Apply / Pay / Repay</li>
+                <li>Clear lock-state messaging with immediate next action</li>
+                <li>Fallback payment methods to reduce checkout dead-ends</li>
+              </ul>
+            </div>
+          </div>
+
+          <h2 class="section-title">More Code Sub-segment Coverage</h2>
+          <div class="grid-2">
+            <div class="box">
+              <h5>Trusted + At checkout</h5>
+              <ul>
+                <li>Numeric balances shown to user</li>
+                <li>Immediate final charge in checkout</li>
+                <li>Core services + trusted services</li>
+              </ul>
+            </div>
+            <div class="box">
+              <h5>Untrusted + At checkout</h5>
+              <ul>
+                <li>No numeric balance exposure</li>
+                <li>Sufficiency flags only</li>
+                <li>Core services + eligibility-only service</li>
+              </ul>
+            </div>
+            <div class="box">
+              <h5>Trusted + After checkout</h5>
+              <ul>
+                <li>Numeric info allowed</li>
+                <li>Authorize first, capture after final amount</li>
+                <li>Core + trusted + after-checkout services</li>
+              </ul>
+            </div>
+            <div class="box">
+              <h5>Untrusted + After checkout</h5>
+              <ul>
+                <li>Eligibility-only visibility</li>
+                <li>Authorize/capture pattern required</li>
+                <li>Core + untrusted + after-checkout services</li>
+              </ul>
+            </div>
+          </div>
+
+          <h2 class="section-title">Page-Level Integration Sequence</h2>
+          <div class="grid-2">
+            <div class="box">
+              <h5>PDP sequence</h5>
+              <ul>
+                <li>1) Call <strong>GetUserLevel</strong></li>
+                <li>2) Call <strong>GetPaymentOptions(amount)</strong> for current SKU price</li>
+                <li>3) If 4pay eligible, call <strong>Get4PayFormulaBreakdown</strong></li>
+                <li>4) L0 click → <strong>CreateCreditApplicationSession</strong></li>
+                <li>5) L2 click → <strong>CreateRepaymentSession</strong></li>
+              </ul>
+            </div>
+            <div class="box">
+              <h5>PLP & Checkout sequence</h5>
+              <ul>
+                <li>PLP: <strong>GetUserLevel</strong> + <strong>BatchPaymentOptions</strong> + <strong>GetInstallmentPreviewLite</strong></li>
+                <li>Checkout start: <strong>CreateCheckoutSession</strong></li>
+                <li>Load methods: <strong>GetPaymentOptionsForCheckout</strong></li>
+                <li>User select: <strong>SelectPaymentMethod</strong></li>
+                <li>If uplift: <strong>InitiateIPGUplift</strong> + <strong>OTPChallenge</strong></li>
+                <li>Finalize: <strong>ConfirmPayment</strong> and reconcile with <strong>PaymentWebhooks</strong></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <h2 class="section-title">Service Technical Documentation</h2>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>GetUserLevel</h4><span class="badge">PDP / PLP / Checkout</span>
+          </div>
+          <div class="kv"><strong>Endpoint</strong><span><code>GET /v1/users/me/level</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Resolve user state: L0, L1, L2 and debt lock status.</span></div>
+          <div class="kv"><strong>Product logic</strong><span>L0 = apply CTA, L1 = buy CTA, L2 = repay CTA first.</span></div>
+          <div class="code">Response
+{
+  "level": 1,
+  "debtLocked": false,
+  "updatedAt": "2026-05-28T08:30:00Z"
+}</div>
+          <div class="eng-note">Engineering: cache short-term (30-60s), re-fetch after return from apply/repay journey.</div>
+        </section>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>GetBalanceAndDebt (trusted only)</h4><span class="badge">Trusted variants</span>
+          </div>
+          <div class="kv"><strong>Endpoint</strong><span><code>GET /v1/users/me/balance-debt</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Return numeric wallet/credit/debt amounts for trusted merchant UX rendering.</span></div>
+          <div class="kv"><strong>Rule</strong><span>Must never be called by untrusted sub-segments.</span></div>
+        </section>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>GetCreditHeadroom (trusted only)</h4><span class="badge">Trusted variants</span>
+          </div>
+          <div class="kv"><strong>Endpoint</strong><span><code>GET /v1/users/me/credit-headroom</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Return live credit headroom for 1pay/4pay recommendation logic.</span></div>
+          <div class="kv"><strong>Product logic</strong><span>Use only in trusted mode; pass values into 4pay formula breakdown request.</span></div>
+        </section>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>GetEligibilityFlagsOnly (untrusted only)</h4><span class="badge">Untrusted variants</span>
+          </div>
+          <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/payment-options/flags</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Return boolean eligibility by method without exposing balances/debt values.</span></div>
+          <div class="kv"><strong>UX output</strong><span>Render labels like “Eligible / Partial / Not eligible” only.</span></div>
+        </section>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>GetPaymentOptions(amount)</h4><span class="badge">PDP</span>
+          </div>
+          <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/payment-options</code></span></div>
+          <div class="kv"><strong>Request</strong><span><code>{ amount, cartRef, userToken }</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Determine eligibility and recommendation among 4pay / 1pay / wallet.</span></div>
+          <div class="kv"><strong>Trusted policy</strong><span>Trusted gets numeric balances; not-trusted gets sufficiency flags only.</span></div>
+          <div class="code">Response (example)
+{
+  "recommended": "fourpay",
+  "methods": {
+    "fourpay": { "eligible": true },
+    "onepay": { "eligible": true, "rapidPurchase": true },
+    "wallet": { "eligible": true, "requiresIPGTopup": true }
+  }
+}</div>
+          <div class="pm-note">PM note: this endpoint directly controls conversion UX on PDP (ordering + visibility of payment methods).</div>
+        </section>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>AuthorizeAmount (after-checkout)</h4><span class="badge">After checkout variants</span>
+          </div>
+          <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/checkout/sessions/{id}/authorize</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Reserve payment capacity before final amount is known (service use cases).</span></div>
+          <div class="kv"><strong>Best practice</strong><span>Never capture at this step; capture only after final amount settlement.</span></div>
+        </section>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>CaptureFinalAmount (after-checkout)</h4><span class="badge">After checkout variants</span>
+          </div>
+          <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/checkout/sessions/{id}/capture</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Capture the exact final amount after service completion.</span></div>
+          <div class="kv"><strong>Rule</strong><span>Validate captured amount against authorization policy and risk controls.</span></div>
+        </section>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>AdjustOrVoidAuthorization (after-checkout)</h4><span class="badge">After checkout variants</span>
+          </div>
+          <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/checkout/sessions/{id}/adjust-or-void</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Adjust hold or void authorization if final charge is canceled or changed materially.</span></div>
+          <div class="kv"><strong>Engineering</strong><span>Must be idempotent and audited with reason codes.</span></div>
+        </section>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>Get4PayFormulaBreakdown</h4><span class="badge">PDP / Checkout</span>
+          </div>
+          <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/fourpay/breakdown</code></span></div>
+          <div class="kv"><strong>Formula</strong><span><code>creditPayment = min(A, B*0.75)</code>, <code>debitPayment = A - creditPayment</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Show due dates and split based on real 4pay rule (not A/4).</span></div>
+          <div class="code">Response (example)
+{
+  "creditPayment": 16500000,
+  "debitPayment": 2000000,
+  "installments": [
+    {"index":1,"dueDate":"2026-06-28","amount":4125000},
+    {"index":2,"dueDate":"2026-07-28","amount":4125000},
+    {"index":3,"dueDate":"2026-08-28","amount":4125000},
+    {"index":4,"dueDate":"2026-09-28","amount":4125000}
+  ]
+}</div>
+        </section>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>CreateCreditApplicationSession</h4><span class="badge">L0 journey</span>
+          </div>
+          <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/credit-applications/session</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Launch apply flow and return user to same merchant page context.</span></div>
+          <div class="kv"><strong>Required fields</strong><span><code>{ amount, returnUrl, merchantRef }</code></span></div>
+          <div class="eng-note">Engineering: validate returnUrl and keep original page state in merchantRef for seamless resume.</div>
+        </section>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>CreateRepaymentSession</h4><span class="badge">L2 journey</span>
+          </div>
+          <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/repayments/session</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Start debt settlement and redirect back to PDP/Checkout after payment.</span></div>
+          <div class="kv"><strong>Required fields</strong><span><code>{ debtId, returnUrl, merchantRef }</code></span></div>
+          <div class="pm-note">PM note: L2 journey must preserve cart and reduce frustration with clear “repay then continue” messaging.</div>
+        </section>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>BatchPaymentOptions(items[])</h4><span class="badge">PLP</span>
+          </div>
+          <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/payment-options/batch</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Fetch BNPL badges for many products in one call (performance-critical PLP service).</span></div>
+          <div class="kv"><strong>Integration logic</strong><span>Call by visible items (pagination/viewport), not whole catalog.</span></div>
+        </section>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>GetInstallmentPreviewLite</h4><span class="badge">PLP</span>
+          </div>
+          <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/fourpay/preview-lite</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Show lightweight “from X/month” text on product cards.</span></div>
+          <div class="kv"><strong>Rule</strong><span>Only teaser output; full legal schedule must come from full breakdown endpoint.</span></div>
+        </section>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>CreateCheckoutSession</h4><span class="badge">Checkout</span>
+          </div>
+          <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/checkout/sessions</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Create single source of truth for checkout state.</span></div>
+          <div class="kv"><strong>Request</strong><span><code>{ merchantOrderId, amount, cart, callbackUrl }</code></span></div>
+          <div class="eng-note">Engineering: use idempotency key; all next calls must use this session ID.</div>
+        </section>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>GetPaymentOptionsForCheckout</h4><span class="badge">Checkout</span>
+          </div>
+          <div class="kv"><strong>Endpoint</strong><span><code>GET /v1/checkout/sessions/{id}/payment-options</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Render final method list for checkout (Digipay + other BNPL + IPG).</span></div>
+          <div class="kv"><strong>Rule</strong><span>Low/Mid/More code all need this list in checkout (per your requirement).</span></div>
+        </section>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>SelectPaymentMethod</h4><span class="badge">Checkout</span>
+          </div>
+          <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/checkout/sessions/{id}/select-method</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Persist selected method and return next action (OTP/IPG/breakdown/confirm).</span></div>
+          <div class="kv"><strong>Allowed methods</strong><span><code>fourpay | onepay | wallet | snappay | tara | ipg</code></span></div>
+        </section>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>InitiateIPGUplift + OTPChallenge</h4><span class="badge">Checkout (wallet/4pay)</span>
+          </div>
+          <div class="kv"><strong>Endpoints</strong><span><code>POST /v1/payments/uplift</code> + <code>POST /v1/otp/challenge</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Handle IPG top-up and OTP verification for secured methods.</span></div>
+          <div class="kv"><strong>Flow order</strong><span>uplift → return → otp challenge → otp verify → confirm</span></div>
+        </section>
+
+        <section class="service">
+          <div class="service-head">
+            <h4>ConfirmPayment + PaymentWebhooks</h4><span class="badge">Checkout finalize</span>
+          </div>
+          <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/checkout/sessions/{id}/confirm</code></span></div>
+          <div class="kv"><strong>Webhooks</strong><span><code>payment.succeeded</code>, <code>payment.failed</code>, <code>repayment.completed</code></span></div>
+          <div class="kv"><strong>Purpose</strong><span>Finalize payment and reconcile merchant order state reliably.</span></div>
+          <div class="eng-note">Engineering: webhook is source of truth; confirmation API response is provisional UI signal.</div>
+        </section>
+
+        <section class="content-card">
+          <h2 class="section-title">Developer + Product alignment notes</h2>
+          <div class="grid-2">
+            <div class="box">
+              <h5>For product managers</h5>
+              <ul>
+                <li>Track conversion by level (L0/L1/L2) separately.</li>
+                <li>Track drop-off points: apply start, repay start, OTP fail, IPG fail.</li>
+                <li>Measure method selection share (4pay vs 1pay vs wallet vs competitors).</li>
+                <li>Ensure all payment explanations are transparent before commit.</li>
+              </ul>
+            </div>
+            <div class="box">
+              <h5>For engineers</h5>
+              <ul>
+                <li>Keep checkout session idempotent and recoverable after refresh.</li>
+                <li>Do not calculate financial values client-side in production.</li>
+                <li>Implement robust retry/backoff for network and provider failures.</li>
+                <li>Use webhook signature verification and idempotent order updates.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script>
+    const p = new URLSearchParams(window.location.search);
+    const page = p.get("page") || "pdp";
+    const level = p.get("level") || "0";
+    const trust = p.get("trust") || "trusted";
+    const finalization = p.get("finalization") || "at";
+    const ctx = document.getElementById("contextInfo");
+    if (ctx) {
+      ctx.textContent = `Selected context from wireframe -> page: ${page.toUpperCase()} | level: ${level} | trust: ${trust} | finalization: ${finalization}`;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>وایرفریم پذیرنده More Code - دیجی‌پی</title>
+  <style>
+    :root {
+      --bg: #f0f0f1;
+      --card: #ffffff;
+      --line: #e0e0e6;
+      --text: #3f4064;
+      --muted: #81858b;
+      --red: #ef394e;
+      --green: #00a049;
+      --amber: #f9a825;
+      --blue: #0288d1;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Vazirmatn", "IRANSansX", "IRANSans", Tahoma, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .top-banner {
+      background: var(--red);
+      color: #fff;
+      font-size: 12px;
+      text-align: center;
+      padding: 7px 10px;
+      font-weight: 700;
+    }
+    .header {
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      padding: 10px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 220px;
+      gap: 12px;
+      align-items: center;
+    }
+    .logo { color: var(--red); font-size: 24px; font-weight: 800; }
+    .search {
+      border: 1px solid var(--line);
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .header-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 11px;
+      background: #fff;
+      font-weight: 600;
+    }
+    .nav {
+      margin-top: 9px;
+      display: flex;
+      gap: 14px;
+      font-size: 11px;
+      color: var(--muted);
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      gap: 12px;
+      padding: 14px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .sidebar .panel-title {
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: #111827;
+    }
+    .btn-group { display: flex; flex-wrap: wrap; gap: 6px; }
+    .btn {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 8px;
+      font-size: 11px;
+      padding: 6px 9px;
+      cursor: pointer;
+    }
+    .btn.active {
+      background: #111827;
+      color: #fff;
+      border-color: #111827;
+    }
+    .meta {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .service-list {
+      list-style: none;
+      display: grid;
+      gap: 6px;
+    }
+    .service-list li {
+      border: 1px dashed #c7c9d1;
+      border-radius: 8px;
+      padding: 7px;
+      font-size: 11px;
+      background: #fcfcfd;
+    }
+    .service-list code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 10px;
+      background: #eef2f7;
+      padding: 1px 5px;
+      border-radius: 5px;
+    }
+    .main .panel-title {
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .wireframe {
+      border: 2px dashed #c7c9d1;
+      border-radius: 12px;
+      padding: 12px;
+      background: #fff;
+    }
+    .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+    .tag {
+      font-size: 10px;
+      border-radius: 999px;
+      padding: 3px 8px;
+      border: 1px solid var(--line);
+      background: #fafafa;
+    }
+    .tag.l0 { background: #fff8e1; border-color: #ffe082; color: #8d6e00; }
+    .tag.l1 { background: #e8f5e9; border-color: #a5d6a7; color: #1b5e20; }
+    .tag.l2 { background: #ffebee; border-color: #ef9a9a; color: #b71c1c; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .box {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      background: #fff;
+      min-height: 90px;
+    }
+    .box h4 { font-size: 12px; margin-bottom: 6px; }
+    .box p { font-size: 11px; color: var(--muted); }
+    .cta {
+      margin-top: 8px;
+      display: inline-block;
+      font-size: 11px;
+      border-radius: 7px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+    .cta.red { background: var(--red); color: #fff; border-color: var(--red); }
+    .cta.blue { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .cta.green { background: var(--green); color: #fff; border-color: var(--green); }
+    .timeline {
+      display: grid;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .timeline div {
+      font-size: 10px;
+      border: 1px dashed #c7c9d1;
+      border-radius: 7px;
+      padding: 5px 7px;
+      background: #fcfcfd;
+    }
+    .plp-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .plp-card {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 7px;
+      min-height: 92px;
+      background: #fff;
+      font-size: 10px;
+    }
+    .checkout-grid {
+      display: grid;
+      grid-template-columns: 1fr 310px;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .method {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 8px;
+      margin-bottom: 7px;
+      font-size: 11px;
+      background: #fff;
+    }
+    .method.reco { border-color: #9ccc65; background: #f1f8e9; }
+    .method.lock { border-color: #ef9a9a; background: #ffebee; }
+    .summary {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 10px;
+      font-size: 11px;
+      background: #fafafa;
+    }
+    .summary .row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+    .summary .total {
+      border-top: 1px solid var(--line);
+      padding-top: 7px;
+      margin-top: 7px;
+      font-weight: 800;
+    }
+    .doc-link {
+      display: block;
+      margin-top: 8px;
+      text-align: center;
+      text-decoration: none;
+      font-size: 11px;
+      background: #111827;
+      color: #fff;
+      border-radius: 8px;
+      padding: 8px;
+    }
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+      .checkout-grid { grid-template-columns: 1fr; }
+      .plp-cards { grid-template-columns: repeat(2, 1fr); }
+      .header-row { grid-template-columns: 110px 1fr; }
+      .header-actions { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-banner">وایرفریم کم‌جزئیات - سگمنت More Code (تم دیجی‌کالا)</div>
+
+  <header class="header">
+    <div class="header-row">
+      <div class="logo">DIGIKALA</div>
+      <div class="search">جستجو در دیجی‌کالا</div>
+      <div class="header-actions">
+        <div class="chip">ورود | ثبت‌نام</div>
+        <div class="chip">🛒 سبد خرید</div>
+      </div>
+    </div>
+    <div class="nav">
+      <span>شگفت‌انگیزها</span>
+      <span>سوپرمارکت</span>
+      <span>کالای دیجیتال</span>
+      <span>خانه و آشپزخانه</span>
+      <span>مد و پوشاک</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <section class="panel">
+        <div class="panel-title">انتخاب صفحه</div>
+        <div class="btn-group" id="pageBtns">
+          <button class="btn active" data-page="pdp">PDP</button>
+          <button class="btn" data-page="plp">PLP</button>
+          <button class="btn" data-page="checkout">Checkout</button>
+        </div>
+        <div class="meta">فقط سگمنت More Code</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">انتخاب سطح کاربر</div>
+        <div class="btn-group" id="levelBtns">
+          <button class="btn active" data-level="0">Level 0</button>
+          <button class="btn" data-level="1">Level 1</button>
+          <button class="btn" data-level="2">Level 2</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">حالت اعتماد (More Code)</div>
+        <div class="btn-group" id="trustBtns">
+          <button class="btn active" data-trust="trusted">Trusted</button>
+          <button class="btn" data-trust="untrusted">Untrusted</button>
+        </div>
+        <div class="meta">Trusted: نمایش اعداد - Untrusted: فقط کافی/ناکافی</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">نوع نهایی‌سازی مبلغ</div>
+        <div class="btn-group" id="finalizationBtns">
+          <button class="btn active" data-finalization="at">At checkout</button>
+          <button class="btn" data-finalization="after">After checkout</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">سرویس‌های دیجی‌پی در این صفحه</div>
+        <ul class="service-list" id="serviceList"></ul>
+        <button class="doc-link" id="openDocsBtn" type="button">مشاهده مستندات کامل سرویس‌ها</button>
+      </section>
+    </aside>
+
+    <main class="main">
+      <section class="panel">
+        <div class="panel-title" id="viewTitle">وایرفریم</div>
+        <div class="wireframe" id="wireframe"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const state = { page: "pdp", level: "0", trust: "trusted", finalization: "at" };
+
+    const servicesByPage = {
+      pdp: [
+        "GetUserLevel",
+        "GetPaymentOptions(amount)",
+        "Get4PayFormulaBreakdown",
+        "CreateCreditApplicationSession",
+        "CreateRepaymentSession"
+      ],
+      plp: [
+        "GetUserLevel",
+        "BatchPaymentOptions(items[])",
+        "GetInstallmentPreviewLite",
+        "CreateCreditApplicationSession",
+        "CreateRepaymentSession"
+      ],
+      checkout: [
+        "CreateCheckoutSession",
+        "GetPaymentOptionsForCheckout",
+        "SelectPaymentMethod",
+        "Get4PayFormulaBreakdown",
+        "InitiateIPGUplift",
+        "OTPChallenge",
+        "ConfirmPayment",
+        "PaymentWebhooks"
+      ]
+    };
+
+    const trustedServices = {
+      trusted: ["GetBalanceAndDebt", "GetCreditHeadroom"],
+      untrusted: ["GetEligibilityFlagsOnly"]
+    };
+
+    const finalizationServices = {
+      at: ["ConfirmPayment"],
+      after: ["AuthorizeAmount", "CaptureFinalAmount", "AdjustOrVoidAuthorization"]
+    };
+
+    function levelLabel(level) {
+      if (level === "0") return "Level 0 - کاربر هنوز اعتبار فعال ندارد";
+      if (level === "1") return "Level 1 - کاربر اعتبار دارد و می‌تواند خرید کند";
+      return "Level 2 - کاربر بدهی دارد و باید تسویه کند";
+    }
+
+    function serviceTags(level) {
+      const trustText = state.trust === "trusted" ? "Trusted" : "Untrusted";
+      const finalizationText = state.finalization === "at" ? "At checkout" : "After checkout";
+      return `<div class="tag-row">
+        <span class="tag ${level === "0" ? "l0" : level === "1" ? "l1" : "l2"}">${levelLabel(level)}</span>
+        <span class="tag">سگمنت: More Code</span>
+        <span class="tag">Trust: ${trustText}</span>
+        <span class="tag">Finalization: ${finalizationText}</span>
+        <span class="tag">تم: Digikala</span>
+      </div>`;
+    }
+
+    function bestPracticeBox() {
+      const trustLine = state.trust === "trusted"
+        ? "Best practice (Klarna/Stripe): موجودی و سقف اعتبار را شفاف و عددی نمایش بده."
+        : "Best practice (Afterpay): برای حریم خصوصی، فقط وضعیت «قابل پرداخت/غیرقابل پرداخت» نمایش بده.";
+      const finalizationLine = state.finalization === "after"
+        ? "Best practice (Klarna): ابتدا authorization بگیر، بعد از نهایی شدن سرویس capture کن."
+        : "Best practice: قبل از تایید، breakdown اقساط و مبلغ امروز را کامل نشان بده.";
+      return `<div class="box" style="margin-top:8px;">
+        <h4>الگوی BNPL Best Practice</h4>
+        <p>${trustLine}</p>
+        <p>${finalizationLine}</p>
+      </div>`;
+    }
+
+    function installmentTimelineFormula() {
+      return `<div class="timeline">
+        <div>قسط ۱: امروز - ۴,۱۲۵,۰۰۰ تومان (سهم اعتباری)</div>
+        <div>قسط ۲: ۳۰ روز بعد - ۴,۱۲۵,۰۰۰ تومان</div>
+        <div>قسط ۳: ۶۰ روز بعد - ۴,۱۲۵,۰۰۰ تومان</div>
+        <div>قسط ۴: ۹۰ روز بعد - ۴,۱۲۵,۰۰۰ تومان</div>
+        <div>پرداخت اولیه IPG: ۲,۰۰۰,۰۰۰ تومان (طبق فرمول 4pay)</div>
+      </div>`;
+    }
+
+    function renderPDP(level) {
+      const trustCopy = state.trust === "trusted"
+        ? "نمایش موجودی 1pay/4pay و بدهی کاربر به صورت عددی"
+        : "عدم نمایش اعداد؛ فقط وضعیت کافی/ناکافی هر روش پرداخت";
+      const finalizationCopy = state.finalization === "after"
+        ? "محصول/سرویس با مبلغ متغیر: فقط پیش‌تخمین + authorization اولیه"
+        : "مبلغ در همین صفحه نهایی است و مستقیم وارد checkout می‌شود";
+      if (level === "0") {
+        return `${serviceTags(level)}
+          <div class="grid-2">
+            <div class="box"><h4>بخش محصول</h4><p>تصویر محصول، عنوان، قیمت، ویژگی‌ها</p><p>${finalizationCopy}</p></div>
+            <div class="box"><h4>باکس پیشنهاد دیجی‌پی</h4><p>CTA: «درخواست اعتبار دیجی‌پی» + نمایش شفاف اقساط 4pay</p>${installmentTimelineFormula()}<span class="cta red">درخواست اعتبار</span></div>
+          </div>${bestPracticeBox()}`;
+      }
+      if (level === "1") {
+        return `${serviceTags(level)}
+          <div class="grid-2">
+            <div class="box"><h4>بخش محصول</h4><p>اطلاعات کامل محصول و قیمت نهایی</p><p>${trustCopy}</p></div>
+            <div class="box"><h4>باکس انتخاب روش پرداخت</h4><p>پیشنهاد روش مناسب: 4pay / 1pay (خرید سریع) / کیف پول</p>${installmentTimelineFormula()}<span class="cta green">خرید سریع با 1pay</span> <span class="cta blue">انتخاب روش</span></div>
+          </div>${bestPracticeBox()}`;
+      }
+      return `${serviceTags(level)}
+        <div class="grid-2">
+          <div class="box"><h4>بخش محصول</h4><p>نمایش محصول و قیمت</p><p>${trustCopy}</p></div>
+          <div class="box"><h4>باکس قفل اعتباری</h4><p>پیام بدهی + CTA تسویه + مسیر بازگشت به همین PDP</p>${installmentTimelineFormula()}<span class="cta red">تسویه بدهی</span> <span class="cta">پرداخت با کیف پول</span></div>
+        </div>${bestPracticeBox()}`;
+    }
+
+    function renderPLP(level) {
+      const banner = level === "0"
+        ? "<p>بنر: درخواست اعتبار برای خرید اقساطی</p>"
+        : level === "1"
+        ? "<p>بنر: روش‌های فعال شما (4pay / 1pay / wallet)</p>"
+        : "<p>بنر: ابتدا بدهی را تسویه کنید تا خرید اعتباری فعال شود</p>";
+      const trustBadgeLogic = state.trust === "trusted"
+        ? "badge کارت‌ها می‌تواند شامل مبلغ ماهانه عددی باشد."
+        : "badge کارت‌ها فقط eligibility را نشان می‌دهد (بدون عدد).";
+
+      return `${serviceTags(level)}
+        <div class="box">
+          <h4>بنر بالای لیست</h4>${banner}
+          <p>${trustBadgeLogic}</p>
+          ${level === "0" ? '<span class="cta red">درخواست اعتبار</span>' : level === "2" ? '<span class="cta red">تسویه بدهی</span>' : '<span class="cta blue">مدیریت روش‌های پرداخت</span>'}
+        </div>
+        <div class="plp-cards">
+          <div class="plp-card">کارت محصول ۱<br/>badge اقساط/وضعیت</div>
+          <div class="plp-card">کارت محصول ۲<br/>badge اقساط/وضعیت</div>
+          <div class="plp-card">کارت محصول ۳<br/>badge اقساط/وضعیت</div>
+          <div class="plp-card">کارت محصول ۴<br/>badge اقساط/وضعیت</div>
+        </div>${bestPracticeBox()}`;
+    }
+
+    function renderCheckout(level) {
+      const afterCheckoutNote = state.finalization === "after"
+        ? `<div class="box" style="margin-bottom:8px;"><h4>حالت After-checkout</h4><p>در checkout فقط authorization انجام می‌شود. بعد از نهایی شدن مبلغ سرویس، Capture با مبلغ واقعی انجام می‌شود.</p></div>`
+        : "";
+      let methods = "";
+      if (level === "0") {
+        methods = `
+          <div class="method lock">4pay - نیاز به درخواست اعتبار</div>
+          <div class="method lock">1pay - نیاز به درخواست اعتبار</div>
+          <div class="method">Wallet + IPG</div>
+          <div class="method">SnappPay / Tara</div>
+          <div class="method">IPG</div>`;
+      } else if (level === "1") {
+        methods = `
+          <div class="method reco">4pay (پیشنهادی) + نمایش فرمول</div>
+          <div class="method">1pay (خرید سریع)</div>
+          <div class="method">Wallet + Cashback</div>
+          <div class="method">SnappPay / Tara</div>
+          <div class="method">IPG</div>`;
+      } else {
+        methods = `
+          <div class="method lock">4pay - قفل تا زمان تسویه</div>
+          <div class="method lock">1pay - قفل تا زمان تسویه</div>
+          <div class="method reco">Wallet (فعال)</div>
+          <div class="method">SnappPay / Tara</div>
+          <div class="method">IPG</div>`;
+      }
+
+      const l0Extra = level === "0" ? '<span class="cta red">درخواست اعتبار</span>' : "";
+      const l2Extra = level === "2" ? '<span class="cta red">تسویه بدهی</span>' : "";
+      const l1Extra = level === "1" ? installmentTimelineFormula() : level === "2" ? installmentTimelineFormula() : "";
+
+      return `${serviceTags(level)}
+        <div class="checkout-grid">
+          <div class="box">
+            <h4>لیست روش‌های پرداخت</h4>
+            ${afterCheckoutNote}
+            ${methods}
+            ${l0Extra}
+            ${l2Extra}
+            ${l1Extra}
+          </div>
+          <div class="summary">
+            <div class="row"><span>محصول</span><span>Galaxy A55</span></div>
+            <div class="row"><span>مبلغ</span><span>18,500,000</span></div>
+            <div class="row"><span>ارسال</span><span>رایگان</span></div>
+            <div class="row total"><span>جمع</span><span>18,500,000</span></div>
+            <span class="cta green" style="margin-top:8px;">تایید و پرداخت</span>
+          </div>
+        </div>${bestPracticeBox()}`;
+    }
+
+    function renderServices() {
+      const ul = document.getElementById("serviceList");
+      const allServices = [
+        ...servicesByPage[state.page],
+        ...trustedServices[state.trust],
+        ...finalizationServices[state.finalization]
+      ];
+      ul.innerHTML = [...new Set(allServices)]
+        .map(s => `<li><code>${s}</code></li>`)
+        .join("");
+    }
+
+    function renderWireframe() {
+      const titleMap = {
+        pdp: "PDP - وایرفریم کم‌جزئیات",
+        plp: "PLP - وایرفریم کم‌جزئیات",
+        checkout: "Checkout - وایرفریم کم‌جزئیات"
+      };
+      const trustText = state.trust === "trusted" ? "Trusted" : "Untrusted";
+      const finalizationText = state.finalization === "at" ? "At checkout" : "After checkout";
+      document.getElementById("viewTitle").textContent = `${titleMap[state.page]} | ${levelLabel(state.level)} | ${trustText} | ${finalizationText}`;
+      const container = document.getElementById("wireframe");
+      if (state.page === "pdp") container.innerHTML = renderPDP(state.level);
+      else if (state.page === "plp") container.innerHTML = renderPLP(state.level);
+      else container.innerHTML = renderCheckout(state.level);
+      renderServices();
+    }
+
+    document.querySelectorAll("#pageBtns .btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#pageBtns .btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.page = btn.dataset.page;
+        renderWireframe();
+      });
+    });
+
+    document.querySelectorAll("#levelBtns .btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#levelBtns .btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.level = btn.dataset.level;
+        renderWireframe();
+      });
+    });
+
+    document.querySelectorAll("#trustBtns .btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#trustBtns .btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.trust = btn.dataset.trust;
+        renderWireframe();
+      });
+    });
+
+    document.querySelectorAll("#finalizationBtns .btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#finalizationBtns .btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.finalization = btn.dataset.finalization;
+        renderWireframe();
+      });
+    });
+
+    document.getElementById("openDocsBtn").addEventListener("click", () => {
+      const params = new URLSearchParams({
+        page: state.page,
+        level: state.level,
+        trust: state.trust,
+        finalization: state.finalization
+      });
+      window.location.href = `./digipay-services-docs.html?${params.toString()}`;
+    });
+
+    renderWireframe();
+  </script>
+</body>
+</html>
