@@ -26,6 +26,20 @@
     .btn { border:1px solid var(--line); border-radius:8px; background:#fff; padding:6px 9px; font-size:11px; cursor:pointer; color:var(--text); }
     .btn.active { background:#111827; color:#fff; border-color:#111827; }
     .live-note { font-size:11px; color:var(--muted); margin-top:6px; }
+    .svc-list { list-style:none; display:grid; gap:6px; }
+    .svc-list li { margin:0; }
+    .svc-btn {
+      width:100%;
+      text-align:right;
+      border:1px dashed #c7c9d1;
+      border-radius:8px;
+      padding:6px 8px;
+      font-size:11px;
+      background:#fcfcfd;
+      cursor:pointer;
+      color:#374151;
+    }
+    .svc-btn:hover { background:#e0f2fe; border-color:#7dd3fc; color:#0c4a6e; }
     .screen { border:2px dashed #c7c9d1; border-radius:12px; background:#fff; padding:12px; }
     .tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
     .tag { border:1px solid var(--line); border-radius:999px; padding:3px 8px; font-size:10px; background:#fafafa; }
@@ -47,6 +61,60 @@
     .total{ border-top:1px solid var(--line); margin-top:6px; padding-top:7px; font-weight:800; }
     .timeline{ margin-top:8px; display:grid; gap:5px; }
     .timeline div{ border:1px dashed #c7c9d1; border-radius:7px; padding:5px 7px; font-size:10px; background:#fcfcfd; }
+    .klarna-plan {
+      margin-top: 8px;
+      border: 1px solid #dbe3f0;
+      border-radius: 10px;
+      padding: 9px;
+      background: #f8fbff;
+    }
+    .kp-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      margin-bottom: 7px;
+    }
+    .kp-head strong { color: #1e3a8a; }
+    .kp-track {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-top: 4px;
+      margin-bottom: 6px;
+    }
+    .kp-step {
+      border: 1px solid #c7d2fe;
+      background: #fff;
+      border-radius: 8px;
+      padding: 6px;
+      font-size: 10px;
+      text-align: center;
+      position: relative;
+    }
+    .kp-step::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #2563eb;
+      display: block;
+      margin: 0 auto 4px;
+    }
+    .kp-step .amt { font-weight: 700; color: #0f172a; }
+    .kp-foot {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      font-size: 10px;
+    }
+    .kp-pill {
+      border: 1px dashed #93c5fd;
+      border-radius: 7px;
+      padding: 5px 6px;
+      background: #eff6ff;
+      color: #1e3a8a;
+    }
     .toast{ margin-top:8px; border:1px solid #bfdbfe; background:#eff6ff; color:#1e3a8a; border-radius:8px; padding:8px; font-size:11px; }
     @media (max-width:1100px){ .layout{ grid-template-columns:1fr; } .header-row{ grid-template-columns:110px 1fr; } .actions{ display:none; } .cards{ grid-template-columns:repeat(2,1fr);} .checkout{ grid-template-columns:1fr;} .grid2{ grid-template-columns:1fr;} }
   </style>
@@ -96,6 +164,11 @@
         <h3>تعامل کاربر (Log)</h3>
         <div id="log" class="live-note">هنوز تعاملی انجام نشده.</div>
       </section>
+      <section class="panel">
+        <h3>سرویس‌های استفاده‌شده در این حالت</h3>
+        <ul id="serviceUsedList" class="svc-list"></ul>
+        <div class="live-note">با کلیک روی هر سرویس، مستندات در تب جدید باز می‌شود.</div>
+      </section>
     </aside>
 
     <main>
@@ -108,6 +181,19 @@
 
   <script>
     const state = { page: "pdp", level: "0", trust: "trusted", finalization: "at", selectedMethod: "fourpay" };
+    const servicesByPage = {
+      pdp: ["GetUserLevel","GetPaymentOptions(amount)","Get4PayFormulaBreakdown","CreateCreditApplicationSession","CreateRepaymentSession"],
+      plp: ["GetUserLevel","BatchPaymentOptions(items[])","GetInstallmentPreviewLite","CreateCreditApplicationSession","CreateRepaymentSession"],
+      checkout: ["CreateCheckoutSession","GetPaymentOptionsForCheckout","SelectPaymentMethod","Get4PayFormulaBreakdown","InitiateIPGUplift + OTPChallenge","ConfirmPayment + PaymentWebhooks"]
+    };
+    const trustServices = {
+      trusted: ["GetBalanceAndDebt (trusted only)","GetCreditHeadroom (trusted only)"],
+      untrusted: ["GetEligibilityFlagsOnly (untrusted only)"]
+    };
+    const finalizationServices = {
+      at: ["ConfirmPayment + PaymentWebhooks"],
+      after: ["AuthorizeAmount (after-checkout)","CaptureFinalAmount (after-checkout)","AdjustOrVoidAuthorization (after-checkout)"]
+    };
     const byId = (id) => document.getElementById(id);
     function log(msg){ byId("log").textContent = msg; }
     function levelText() { return state.level === "0" ? "L0: بدون اعتبار" : state.level === "1" ? "L1: دارای اعتبار" : "L2: دارای بدهی"; }
@@ -121,17 +207,28 @@
       </div>`;
     }
     function timeline(){
-      return `<div class="timeline">
-        <div>قسط ۱: امروز - ۴,۱۲۵,۰۰۰</div>
-        <div>قسط ۲: ۳۰ روز بعد - ۴,۱۲۵,۰۰۰</div>
-        <div>قسط ۳: ۶۰ روز بعد - ۴,۱۲۵,۰۰۰</div>
-        <div>قسط ۴: ۹۰ روز بعد - ۴,۱۲۵,۰۰۰</div>
-        <div>پرداخت اولیه IPG: ۲,۰۰۰,۰۰۰ (طبق فرمول 4pay)</div>
+      return `<div class="klarna-plan">
+        <div class="kp-head">
+          <strong>برنامه پرداخت ۴ قسطی</strong>
+          <span>نمایش شفاف قبل از تایید</span>
+        </div>
+        <div class="kp-track">
+          <div class="kp-step"><div>امروز</div><div class="amt">۴,۱۲۵,۰۰۰</div></div>
+          <div class="kp-step"><div>+۳۰ روز</div><div class="amt">۴,۱۲۵,۰۰۰</div></div>
+          <div class="kp-step"><div>+۶۰ روز</div><div class="amt">۴,۱۲۵,۰۰۰</div></div>
+          <div class="kp-step"><div>+۹۰ روز</div><div class="amt">۴,۱۲۵,۰۰۰</div></div>
+        </div>
+        <div class="kp-foot">
+          <div class="kp-pill">پرداخت اولیه IPG: ۲,۰۰۰,۰۰۰</div>
+          <div class="kp-pill">سهم اعتباری 4pay: ۱۶,۵۰۰,۰۰۰</div>
+        </div>
       </div>`;
     }
 
     function renderPDP(){
-      const trustText = state.trust === "trusted" ? "موجودی و بدهی به‌صورت عددی نمایش داده می‌شود." : "فقط وضعیت قابل/غیرقابل پرداخت نمایش داده می‌شود.";
+      const trustText = state.trust === "trusted"
+        ? "دیجی‌پی مبلغ اعتبار کاربر را برمی‌گرداند و merchant تجربه دقیق‌تری می‌سازد."
+        : "merchant مبلغ سبد را ارسال می‌کند و دیجی‌پی فقط پاسخ کافی/ناکافی می‌دهد.";
       const finText = state.finalization === "after" ? "مبلغ نهایی بعد از سرویس مشخص می‌شود (authorize → capture)." : "مبلغ در checkout نهایی می‌شود.";
       let right = "";
       if (state.level === "0") right = `<h4>دیجی‌پی برای شما فعال نیست</h4><p>با فعال‌سازی اعتبار، پرداخت قسطی را شروع کنید.</p>${timeline()}<button class="cta red" id="applyBtn">درخواست اعتبار</button>`;
@@ -158,21 +255,33 @@
 
     function renderCheckout(){
       const after = state.finalization==="after" ? `<div class="box" style="margin-bottom:8px;"><h4>حالت After-checkout</h4><p>ابتدا authorization انجام می‌شود و capture پس از مبلغ نهایی سرویس.</p></div>` : "";
+      const trustedMotivation = state.trust === "trusted" ? `
+        <div class="box" style="margin-bottom:8px;border-color:#93c5fd;background:#eff6ff;">
+          <h4>پیشنهاد شخصی‌سازی‌شده دیجی‌پی (Trusted)</h4>
+          <p>موجودی 1pay: ۱۸,۵۰۰,۰۰۰ تومان</p>
+          <p>موجودی 4pay: ۲۲,۰۰۰,۰۰۰ تومان</p>
+          <p>موجودی کیف پول: ۱,۲۰۰,۰۰۰ تومان</p>
+          <p>با توجه به مانده‌ها، دیجی‌پی 4pay را برای این سبد پیشنهاد می‌دهد.</p>
+        </div>` : `
+        <div class="box" style="margin-bottom:8px;border-color:#fed7aa;background:#fff7ed;">
+          <h4>حالت Untrusted</h4>
+          <p>مبلغ سبد به دیجی‌پی ارسال می‌شود و فقط وضعیت «کافی/ناکافی» برمی‌گردد (بدون نمایش موجودی).</p>
+        </div>`;
       let methods = "";
       if (state.level === "0") {
         methods += method("4pay - نیاز به فعال‌سازی اعتبار","fourpay","",true);
         methods += method("1pay - نیاز به فعال‌سازی اعتبار","onepay","",true);
       } else if (state.level === "1") {
-        methods += method("4pay (پیشنهادی)","fourpay","شفاف‌سازی مبلغ امروز + اقساط");
-        methods += method("1pay (خرید سریع)","onepay","تجربه سریع خرید");
+        methods += method("4pay (پیشنهادی)","fourpay", state.trust==="trusted" ? "موجودی 4pay: ۲۲,۰۰۰,۰۰۰ | نمایش اقساط پس از انتخاب" : "کافی برای این سبد");
+        methods += method("1pay (خرید سریع)","onepay", state.trust==="trusted" ? "موجودی 1pay: ۱۸,۵۰۰,۰۰۰" : "وضعیت: کافی");
       } else {
         methods += method("4pay - قفل تا زمان تسویه","fourpay","",true);
         methods += method("1pay - قفل تا زمان تسویه","onepay","",true);
       }
-      methods += method("Wallet","wallet","پرداخت + تکمیل با IPG");
+      methods += method("Wallet","wallet", state.trust==="trusted" ? "موجودی کیف پول: ۱,۲۰۰,۰۰۰ + تکمیل با IPG" : "کافی با تکمیل IPG");
       methods += method("SnappPay / Tara","otherbnpl","روش جایگزین");
       methods += method("IPG","ipg","پرداخت مستقیم بانکی");
-      return `${tags()}<div class="checkout"><div class="box"><h4>روش‌های پرداخت</h4>${after}${methods}${(state.level==="1"||state.level==="2")?timeline():""}${state.level==="0"?'<button class="cta red" id="applyBtn">درخواست اعتبار</button>':""}${state.level==="2"?'<button class="cta red" id="repayBtn">تسویه بدهی</button>':""}<button class="cta green" id="confirmBtn">تایید و پرداخت</button></div>
+      return `${tags()}<div class="checkout"><div class="box"><h4>روش‌های پرداخت</h4>${after}${trustedMotivation}${methods}${state.selectedMethod==="fourpay" ? timeline() : ""}${state.level==="0"?'<button class="cta red" id="applyBtn">درخواست اعتبار</button>':""}${state.level==="2"?'<button class="cta red" id="repayBtn">تسویه بدهی</button>':""}<button class="cta green" id="confirmBtn">تایید و پرداخت</button></div>
       <div class="summary"><div class="row"><span>محصول</span><span>Galaxy A55</span></div><div class="row"><span>مبلغ</span><span>18,500,000</span></div><div class="row"><span>ارسال</span><span>رایگان</span></div><div class="row total"><span>جمع</span><span>18,500,000</span></div><div class="toast" id="resultMsg">برای ادامه یک روش پرداخت انتخاب کنید.</div></div></div>`;
     }
 
@@ -183,6 +292,7 @@
         m.addEventListener("click",()=>{
           if (locked) { log("این روش فعلاً قفل است."); return; }
           state.selectedMethod = m.dataset.method; draw(); log(`روش پرداخت انتخاب شد: ${state.selectedMethod}`);
+          if (state.selectedMethod === "fourpay") log("جزئیات اقساط ۴پی نمایش داده شد.");
         });
       });
       const apply = byId("applyBtn"); if (apply) apply.addEventListener("click",()=>{ state.level="1"; activate("levelBtns","1"); draw(); log("درخواست اعتبار تکمیل شد -> کاربر وارد Level 1 شد."); });
@@ -213,7 +323,31 @@
       if (state.page==="pdp") screen.innerHTML = renderPDP();
       else if (state.page==="plp") screen.innerHTML = renderPLP();
       else screen.innerHTML = renderCheckout();
+      renderServiceUsedList();
       bindInteractions();
+    }
+
+    function renderServiceUsedList(){
+      const all = [
+        ...servicesByPage[state.page],
+        ...trustServices[state.trust],
+        ...finalizationServices[state.finalization]
+      ];
+      const uniq = [...new Set(all)];
+      const ul = byId("serviceUsedList");
+      ul.innerHTML = uniq.map((svc)=>`<li><button class="svc-btn" type="button" data-svc="${svc}">${svc}</button></li>`).join("");
+      ul.querySelectorAll(".svc-btn").forEach((btn)=>{
+        btn.addEventListener("click", ()=>{
+          const params = new URLSearchParams({
+            page: state.page,
+            level: state.level,
+            trust: state.trust,
+            finalization: state.finalization,
+            service: btn.dataset.svc
+          });
+          window.open(`./digipay-services-docs.html?${params.toString()}`, "_blank", "noopener");
+        });
+      });
     }
 
     document.querySelectorAll("#pageBtns .btn").forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll("#pageBtns .btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); state.page=b.dataset.page; draw(); }));

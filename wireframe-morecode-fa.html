@@ -322,7 +322,7 @@
           <button class="btn active" data-trust="trusted">Trusted</button>
           <button class="btn" data-trust="untrusted">Untrusted</button>
         </div>
-        <div class="meta">Trusted: نمایش اعداد - Untrusted: فقط کافی/ناکافی</div>
+        <div class="meta">Trusted: بازگشت مبلغ اعتبار | Untrusted: ارسال مبلغ سبد و دریافت کافی/ناکافی</div>
       </section>
 
       <section class="panel">
@@ -336,6 +336,7 @@
       <section class="panel">
         <div class="panel-title">سرویس‌های دیجی‌پی در این صفحه</div>
         <ul class="service-list" id="serviceList"></ul>
+        <button class="doc-link" id="openFinalUiBtn" type="button" style="margin-bottom:6px;background:#0f766e;">مشاهده صفحه نهایی Merchant UI</button>
         <button class="doc-link" id="openDocsBtn" type="button">مشاهده مستندات کامل سرویس‌ها</button>
       </section>
     </aside>
@@ -408,8 +409,8 @@
 
     function bestPracticeBox() {
       const trustLine = state.trust === "trusted"
-        ? "Best practice (Klarna/Stripe): موجودی و سقف اعتبار را شفاف و عددی نمایش بده."
-        : "Best practice (Afterpay): برای حریم خصوصی، فقط وضعیت «قابل پرداخت/غیرقابل پرداخت» نمایش بده.";
+        ? "Best practice (Klarna/Stripe): مبلغ اعتبار کاربر را نمایش بده تا UX شخصی‌تر و دقیق‌تر شود."
+        : "Best practice (Afterpay): merchant مبلغ سبد را ارسال می‌کند و فقط پاسخ «کافی/ناکافی» می‌گیرد.";
       const finalizationLine = state.finalization === "after"
         ? "Best practice (Klarna): ابتدا authorization بگیر، بعد از نهایی شدن سرویس capture کن."
         : "Best practice: قبل از تایید، breakdown اقساط و مبلغ امروز را کامل نشان بده.";
@@ -432,8 +433,8 @@
 
     function renderPDP(level) {
       const trustCopy = state.trust === "trusted"
-        ? "نمایش موجودی 1pay/4pay و بدهی کاربر به صورت عددی"
-        : "عدم نمایش اعداد؛ فقط وضعیت کافی/ناکافی هر روش پرداخت";
+        ? "دیجی‌پی مبلغ اعتبار کاربر را برمی‌گرداند و merchant می‌تواند تجربه شخصی‌سازی کند."
+        : "merchant مبلغ سبد را می‌فرستد؛ دیجی‌پی فقط می‌گوید اعتبار برای پرداخت کافی هست یا نه.";
       const finalizationCopy = state.finalization === "after"
         ? "محصول/سرویس با مبلغ متغیر: فقط پیش‌تخمین + authorization اولیه"
         : "مبلغ در همین صفحه نهایی است و مستقیم وارد checkout می‌شود";
@@ -465,8 +466,8 @@
         ? "<p>بنر: روش‌های فعال شما (4pay / 1pay / wallet)</p>"
         : "<p>بنر: ابتدا بدهی را تسویه کنید تا خرید اعتباری فعال شود</p>";
       const trustBadgeLogic = state.trust === "trusted"
-        ? "badge کارت‌ها می‌تواند شامل مبلغ ماهانه عددی باشد."
-        : "badge کارت‌ها فقط eligibility را نشان می‌دهد (بدون عدد).";
+        ? "badge کارت‌ها می‌تواند شامل مبلغ ماهانه عددی و سقف اعتبار باشد."
+        : "badge کارت‌ها فقط کافی/ناکافی را نشان می‌دهد؛ بدون نمایش مبلغ اعتبار.";
 
       return `${serviceTags(level)}
         <div class="box">
@@ -620,6 +621,16 @@
         finalization: state.finalization
       });
       window.location.href = `./digipay-services-docs.html?${params.toString()}`;
+    });
+
+    document.getElementById("openFinalUiBtn").addEventListener("click", () => {
+      const params = new URLSearchParams({
+        page: state.page,
+        level: state.level,
+        trust: state.trust,
+        finalization: state.finalization
+      });
+      window.location.href = `./merchant-ui.html?${params.toString()}`;
     });
 
     renderWireframe();

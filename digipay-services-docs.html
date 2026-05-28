@@ -56,11 +56,23 @@
     .side ul { list-style: none; display: grid; gap: 6px; }
     .side li {
       font-size: 12px;
+      padding: 0;
+      background: transparent;
+      border: none;
+    }
+    .svc-link {
+      width: 100%;
+      text-align: left;
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 7px 8px;
       background: #fcfdff;
+      font-size: 12px;
+      color: var(--text);
+      cursor: pointer;
     }
+    .svc-link:hover { background: #eef6ff; border-color: #bfdbfe; }
+    .svc-link.active { background: #e0f2fe; border-color: #7dd3fc; font-weight: 700; color: #0369a1; }
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -188,27 +200,25 @@
     <div class="layout">
       <aside class="side">
         <h3>Service Catalog (used in wireframe)</h3>
-        <ul>
-          <li>GetUserLevel</li>
-          <li>GetPaymentOptions(amount)</li>
-          <li>Get4PayFormulaBreakdown</li>
-          <li>CreateCreditApplicationSession</li>
-          <li>CreateRepaymentSession</li>
-          <li>BatchPaymentOptions(items[])</li>
-          <li>GetInstallmentPreviewLite</li>
-          <li>CreateCheckoutSession</li>
-          <li>GetPaymentOptionsForCheckout</li>
-          <li>SelectPaymentMethod</li>
-          <li>InitiateIPGUplift</li>
-          <li>OTPChallenge</li>
-          <li>ConfirmPayment</li>
-          <li>PaymentWebhooks</li>
-          <li>GetBalanceAndDebt (trusted only)</li>
-          <li>GetCreditHeadroom (trusted only)</li>
-          <li>GetEligibilityFlagsOnly (untrusted only)</li>
-          <li>AuthorizeAmount (after-checkout)</li>
-          <li>CaptureFinalAmount (after-checkout)</li>
-          <li>AdjustOrVoidAuthorization (after-checkout)</li>
+        <ul id="serviceCatalogList">
+          <li><button class="svc-link" data-target-service="GetUserLevel">GetUserLevel</button></li>
+          <li><button class="svc-link" data-target-service="GetPaymentOptions(amount)">GetPaymentOptions(amount)</button></li>
+          <li><button class="svc-link" data-target-service="Get4PayFormulaBreakdown">Get4PayFormulaBreakdown</button></li>
+          <li><button class="svc-link" data-target-service="CreateCreditApplicationSession">CreateCreditApplicationSession</button></li>
+          <li><button class="svc-link" data-target-service="CreateRepaymentSession">CreateRepaymentSession</button></li>
+          <li><button class="svc-link" data-target-service="BatchPaymentOptions(items[])">BatchPaymentOptions(items[])</button></li>
+          <li><button class="svc-link" data-target-service="GetInstallmentPreviewLite">GetInstallmentPreviewLite</button></li>
+          <li><button class="svc-link" data-target-service="CreateCheckoutSession">CreateCheckoutSession</button></li>
+          <li><button class="svc-link" data-target-service="GetPaymentOptionsForCheckout">GetPaymentOptionsForCheckout</button></li>
+          <li><button class="svc-link" data-target-service="SelectPaymentMethod">SelectPaymentMethod</button></li>
+          <li><button class="svc-link" data-target-service="InitiateIPGUplift + OTPChallenge">InitiateIPGUplift + OTPChallenge</button></li>
+          <li><button class="svc-link" data-target-service="ConfirmPayment + PaymentWebhooks">ConfirmPayment + PaymentWebhooks</button></li>
+          <li><button class="svc-link" data-target-service="GetBalanceAndDebt (trusted only)">GetBalanceAndDebt (trusted only)</button></li>
+          <li><button class="svc-link" data-target-service="GetCreditHeadroom (trusted only)">GetCreditHeadroom (trusted only)</button></li>
+          <li><button class="svc-link" data-target-service="GetEligibilityFlagsOnly (untrusted only)">GetEligibilityFlagsOnly (untrusted only)</button></li>
+          <li><button class="svc-link" data-target-service="AuthorizeAmount (after-checkout)">AuthorizeAmount (after-checkout)</button></li>
+          <li><button class="svc-link" data-target-service="CaptureFinalAmount (after-checkout)">CaptureFinalAmount (after-checkout)</button></li>
+          <li><button class="svc-link" data-target-service="AdjustOrVoidAuthorization (after-checkout)">AdjustOrVoidAuthorization (after-checkout)</button></li>
         </ul>
       </aside>
 
@@ -228,7 +238,7 @@
             </div>
             <div class="mini">
               <h4>Risk & Policy View</h4>
-              <p>Trusted vs not-trusted behavior and repayment lock logic are embedded per service.</p>
+              <p>Trusted returns numeric credit amounts; untrusted receives sufficiency only for submitted basket amount.</p>
             </div>
           </div>
 
@@ -266,7 +276,7 @@
               <h5>Untrusted + At checkout</h5>
               <ul>
                 <li>No numeric balance exposure</li>
-                <li>Sufficiency flags only</li>
+                <li>Merchant sends basket amount and receives only enough/not-enough flags</li>
                 <li>Core services + eligibility-only service</li>
               </ul>
             </div>
@@ -339,6 +349,7 @@
           <div class="kv"><strong>Endpoint</strong><span><code>GET /v1/users/me/balance-debt</code></span></div>
           <div class="kv"><strong>Purpose</strong><span>Return numeric wallet/credit/debt amounts for trusted merchant UX rendering.</span></div>
           <div class="kv"><strong>Rule</strong><span>Must never be called by untrusted sub-segments.</span></div>
+          <div class="kv"><strong>Checkout UX usage</strong><span>Use all returned balances in checkout (1pay, 4pay, wallet) to motivate Digipay method selection with personalized amounts.</span></div>
         </section>
 
         <section class="service">
@@ -346,8 +357,8 @@
             <h4>GetCreditHeadroom (trusted only)</h4><span class="badge">Trusted variants</span>
           </div>
           <div class="kv"><strong>Endpoint</strong><span><code>GET /v1/users/me/credit-headroom</code></span></div>
-          <div class="kv"><strong>Purpose</strong><span>Return live credit headroom for 1pay/4pay recommendation logic.</span></div>
-          <div class="kv"><strong>Product logic</strong><span>Use only in trusted mode; pass values into 4pay formula breakdown request.</span></div>
+          <div class="kv"><strong>Purpose</strong><span>Return live headroom for each Digipay payment rail (1pay, 4pay, wallet top-up support flags).</span></div>
+          <div class="kv"><strong>Product logic</strong><span>Use only in trusted mode to personalize all method cards, then pass 4pay value into formula breakdown request.</span></div>
         </section>
 
         <section class="service">
@@ -355,7 +366,9 @@
             <h4>GetEligibilityFlagsOnly (untrusted only)</h4><span class="badge">Untrusted variants</span>
           </div>
           <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/payment-options/flags</code></span></div>
-          <div class="kv"><strong>Purpose</strong><span>Return boolean eligibility by method without exposing balances/debt values.</span></div>
+          <div class="kv"><strong>Purpose</strong><span>Merchant sends basket amount; Digipay returns only whether user credit is enough to pay that basket.</span></div>
+          <div class="kv"><strong>Request</strong><span><code>{ basketAmount, userToken, methods[] }</code></span></div>
+          <div class="kv"><strong>Response</strong><span><code>{ fourpayEnough, onepayEnough, walletEnough, reasons[] }</code></span></div>
           <div class="kv"><strong>UX output</strong><span>Render labels like “Eligible / Partial / Not eligible” only.</span></div>
         </section>
 
@@ -366,7 +379,7 @@
           <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/payment-options</code></span></div>
           <div class="kv"><strong>Request</strong><span><code>{ amount, cartRef, userToken }</code></span></div>
           <div class="kv"><strong>Purpose</strong><span>Determine eligibility and recommendation among 4pay / 1pay / wallet.</span></div>
-          <div class="kv"><strong>Trusted policy</strong><span>Trusted gets numeric balances; not-trusted gets sufficiency flags only.</span></div>
+          <div class="kv"><strong>Trusted policy</strong><span>Trusted: return numeric credit amounts. Untrusted: merchant sends basket amount and receives enough/not-enough only.</span></div>
           <div class="code">Response (example)
 {
   "recommended": "fourpay",
@@ -481,6 +494,7 @@
           <div class="kv"><strong>Endpoint</strong><span><code>GET /v1/checkout/sessions/{id}/payment-options</code></span></div>
           <div class="kv"><strong>Purpose</strong><span>Render final method list for checkout (Digipay + other BNPL + IPG).</span></div>
           <div class="kv"><strong>Rule</strong><span>Low/Mid/More code all need this list in checkout (per your requirement).</span></div>
+          <div class="kv"><strong>Trusted vs Untrusted</strong><span>Trusted combines this endpoint with numeric balances for all methods (1pay/4pay/wallet). Untrusted must display only enough/not-enough for submitted basket amount.</span></div>
         </section>
 
         <section class="service">
@@ -490,6 +504,7 @@
           <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/checkout/sessions/{id}/select-method</code></span></div>
           <div class="kv"><strong>Purpose</strong><span>Persist selected method and return next action (OTP/IPG/breakdown/confirm).</span></div>
           <div class="kv"><strong>Allowed methods</strong><span><code>fourpay | onepay | wallet | snappay | tara | ipg</code></span></div>
+          <div class="kv"><strong>Interaction rule</strong><span>When user selects <code>fourpay</code>, immediately show installment count + installment amounts + due dates before final confirmation.</span></div>
         </section>
 
         <section class="service">
@@ -549,17 +564,33 @@
       ctx.textContent = `Selected context from wireframe -> page: ${page.toUpperCase()} | level: ${level} | trust: ${trust} | finalization: ${finalization}${service ? ` | service: ${service}` : ""}`;
     }
 
-    if (service) {
+    function focusService(name) {
       const all = Array.from(document.querySelectorAll(".service"));
       const matched = all.find((sec) => {
         const h = sec.querySelector("h4");
-        return h && h.textContent.trim() === service;
+        return h && h.textContent.trim() === name;
       });
+      all.forEach((s) => s.classList.remove("focus"));
+      document.querySelectorAll(".svc-link").forEach((btn) => btn.classList.remove("active"));
       if (matched) {
-        all.forEach((s) => s.classList.remove("focus"));
         matched.classList.add("focus");
         matched.scrollIntoView({ behavior: "smooth", block: "start" });
       }
+      const activeBtn = Array.from(document.querySelectorAll(".svc-link")).find((btn) => btn.dataset.targetService === name);
+      if (activeBtn) activeBtn.classList.add("active");
+      const url = new URL(window.location.href);
+      url.searchParams.set("service", name);
+      history.replaceState(null, "", url.toString());
+    }
+
+    document.querySelectorAll(".svc-link").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        focusService(btn.dataset.targetService);
+      });
+    });
+
+    if (service) {
+      focusService(service);
     }
   </script>
 </body>
