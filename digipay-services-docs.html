@@ -83,6 +83,10 @@
       background: #fff;
       margin-bottom: 10px;
     }
+    .service.focus {
+      border-color: #0ea5e9;
+      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.18);
+    }
     .service-head {
       display: flex;
       justify-content: space-between;
@@ -539,9 +543,23 @@
     const level = p.get("level") || "0";
     const trust = p.get("trust") || "trusted";
     const finalization = p.get("finalization") || "at";
+    const service = p.get("service") || "";
     const ctx = document.getElementById("contextInfo");
     if (ctx) {
-      ctx.textContent = `Selected context from wireframe -> page: ${page.toUpperCase()} | level: ${level} | trust: ${trust} | finalization: ${finalization}`;
+      ctx.textContent = `Selected context from wireframe -> page: ${page.toUpperCase()} | level: ${level} | trust: ${trust} | finalization: ${finalization}${service ? ` | service: ${service}` : ""}`;
+    }
+
+    if (service) {
+      const all = Array.from(document.querySelectorAll(".service"));
+      const matched = all.find((sec) => {
+        const h = sec.querySelector("h4");
+        return h && h.textContent.trim() === service;
+      });
+      if (matched) {
+        all.forEach((s) => s.classList.remove("focus"));
+        matched.classList.add("focus");
+        matched.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
   </script>
 </body>

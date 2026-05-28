@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Merchant Final UI - Digipay (More Code)</title>
+  <style>
+    :root {
+      --bg: #f0f0f1; --card:#fff; --line:#e0e0e6; --text:#3f4064; --muted:#81858b;
+      --red:#ef394e; --green:#00a049; --amber:#f59f00; --blue:#0288d1;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:"Vazirmatn","IRANSansX","IRANSans",Tahoma,sans-serif; background:var(--bg); color:var(--text); }
+    .top { background:var(--red); color:#fff; text-align:center; padding:7px; font-size:12px; font-weight:700; }
+    .header { background:#fff; border-bottom:1px solid var(--line); padding:10px 16px; }
+    .header-row { display:grid; grid-template-columns:120px 1fr 210px; gap:10px; align-items:center; }
+    .logo { color:var(--red); font-size:24px; font-weight:800; }
+    .search { background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-size:12px; color:var(--muted); }
+    .actions { display:flex; gap:8px; justify-content:flex-end; }
+    .chip { border:1px solid var(--line); border-radius:8px; font-size:11px; background:#fff; padding:8px 9px; font-weight:600; }
+    .nav { display:flex; gap:13px; font-size:11px; color:var(--muted); margin-top:8px; overflow:auto; white-space:nowrap; }
+    .layout { max-width:1380px; margin:0 auto; padding:14px; display:grid; grid-template-columns:300px 1fr; gap:12px; }
+    .panel { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin-bottom:10px; }
+    .panel h3 { font-size:12px; margin-bottom:8px; color:#111827; }
+    .btns { display:flex; gap:6px; flex-wrap:wrap; }
+    .btn { border:1px solid var(--line); border-radius:8px; background:#fff; padding:6px 9px; font-size:11px; cursor:pointer; color:var(--text); }
+    .btn.active { background:#111827; color:#fff; border-color:#111827; }
+    .live-note { font-size:11px; color:var(--muted); margin-top:6px; }
+    .screen { border:2px dashed #c7c9d1; border-radius:12px; background:#fff; padding:12px; }
+    .tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+    .tag { border:1px solid var(--line); border-radius:999px; padding:3px 8px; font-size:10px; background:#fafafa; }
+    .t0{ background:#fff8e1; border-color:#ffe082; color:#8d6e00; } .t1{ background:#e8f5e9; border-color:#a5d6a7; color:#1b5e20; } .t2{ background:#ffebee; border-color:#ef9a9a; color:#b71c1c; }
+    .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .box{ border:1px solid var(--line); border-radius:10px; padding:10px; background:#fff; }
+    .box h4{ font-size:12px; margin-bottom:6px; }
+    .box p{ font-size:11px; color:var(--muted); }
+    .cta{ border:1px solid var(--line); border-radius:8px; padding:7px 10px; font-size:11px; background:#fff; cursor:pointer; margin-top:8px; }
+    .red{ background:var(--red); color:#fff; border-color:var(--red); } .green{ background:var(--green); color:#fff; border-color:var(--green); } .blue{ background:var(--blue); color:#fff; border-color:var(--blue); } .amber{ background:var(--amber); color:#fff; border-color:var(--amber); }
+    .cards{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:8px; }
+    .card{ border:1px solid var(--line); border-radius:9px; padding:8px; font-size:10px; background:#fff; cursor:pointer; }
+    .checkout{ display:grid; grid-template-columns:1fr 300px; gap:10px; }
+    .method{ border:1px solid var(--line); border-radius:9px; padding:8px; margin-bottom:7px; font-size:11px; background:#fff; cursor:pointer; }
+    .method.sel{ border-color:#8bc34a; background:#f1f8e9; }
+    .method.lock{ border-color:#ef9a9a; background:#ffebee; cursor:not-allowed; }
+    .summary{ border:1px solid var(--line); border-radius:9px; padding:10px; background:#fafafa; font-size:11px; }
+    .row{ display:flex; justify-content:space-between; margin-bottom:5px; }
+    .total{ border-top:1px solid var(--line); margin-top:6px; padding-top:7px; font-weight:800; }
+    .timeline{ margin-top:8px; display:grid; gap:5px; }
+    .timeline div{ border:1px dashed #c7c9d1; border-radius:7px; padding:5px 7px; font-size:10px; background:#fcfcfd; }
+    .toast{ margin-top:8px; border:1px solid #bfdbfe; background:#eff6ff; color:#1e3a8a; border-radius:8px; padding:8px; font-size:11px; }
+    @media (max-width:1100px){ .layout{ grid-template-columns:1fr; } .header-row{ grid-template-columns:110px 1fr; } .actions{ display:none; } .cards{ grid-template-columns:repeat(2,1fr);} .checkout{ grid-template-columns:1fr;} .grid2{ grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+  <div class="top">Final Merchant UI (More Code) - End-user interaction simulation</div>
+  <header class="header">
+    <div class="header-row">
+      <div class="logo">DIGIKALA</div>
+      <div class="search">جستجو در دیجی‌کالا</div>
+      <div class="actions"><div class="chip">ورود</div><div class="chip">🛒 سبد</div></div>
+    </div>
+    <div class="nav"><span>شگفت‌انگیزها</span><span>کالای دیجیتال</span><span>خانه</span><span>مد</span></div>
+  </header>
+
+  <div class="layout">
+    <aside>
+      <section class="panel">
+        <h3>شبیه‌ساز صفحه</h3>
+        <div class="btns" id="pageBtns">
+          <button class="btn active" data-page="pdp">PDP</button>
+          <button class="btn" data-page="plp">PLP</button>
+          <button class="btn" data-page="checkout">Checkout</button>
+        </div>
+      </section>
+      <section class="panel">
+        <h3>شبیه‌ساز سطح کاربر</h3>
+        <div class="btns" id="levelBtns">
+          <button class="btn active" data-level="0">Level 0</button>
+          <button class="btn" data-level="1">Level 1</button>
+          <button class="btn" data-level="2">Level 2</button>
+        </div>
+      </section>
+      <section class="panel">
+        <h3>زیرسگمنت More Code</h3>
+        <div class="btns" id="trustBtns">
+          <button class="btn active" data-trust="trusted">Trusted</button>
+          <button class="btn" data-trust="untrusted">Untrusted</button>
+        </div>
+        <div class="btns" id="finalBtns" style="margin-top:6px;">
+          <button class="btn active" data-final="at">At checkout</button>
+          <button class="btn" data-final="after">After checkout</button>
+        </div>
+        <div class="live-note">با تغییر این گزینه‌ها UX نهایی کاربر را ببین.</div>
+      </section>
+      <section class="panel">
+        <h3>تعامل کاربر (Log)</h3>
+        <div id="log" class="live-note">هنوز تعاملی انجام نشده.</div>
+      </section>
+    </aside>
+
+    <main>
+      <section class="panel">
+        <h3 id="title">Final UI</h3>
+        <div class="screen" id="screen"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const state = { page: "pdp", level: "0", trust: "trusted", finalization: "at", selectedMethod: "fourpay" };
+    const byId = (id) => document.getElementById(id);
+    function log(msg){ byId("log").textContent = msg; }
+    function levelText() { return state.level === "0" ? "L0: بدون اعتبار" : state.level === "1" ? "L1: دارای اعتبار" : "L2: دارای بدهی"; }
+    function tags(){
+      const tClass = state.level === "0" ? "t0" : state.level === "1" ? "t1" : "t2";
+      return `<div class="tags">
+        <span class="tag ${tClass}">${levelText()}</span>
+        <span class="tag">Trust: ${state.trust}</span>
+        <span class="tag">Finalization: ${state.finalization}</span>
+        <span class="tag">Best-practice BNPL UX</span>
+      </div>`;
+    }
+    function timeline(){
+      return `<div class="timeline">
+        <div>قسط ۱: امروز - ۴,۱۲۵,۰۰۰</div>
+        <div>قسط ۲: ۳۰ روز بعد - ۴,۱۲۵,۰۰۰</div>
+        <div>قسط ۳: ۶۰ روز بعد - ۴,۱۲۵,۰۰۰</div>
+        <div>قسط ۴: ۹۰ روز بعد - ۴,۱۲۵,۰۰۰</div>
+        <div>پرداخت اولیه IPG: ۲,۰۰۰,۰۰۰ (طبق فرمول 4pay)</div>
+      </div>`;
+    }
+
+    function renderPDP(){
+      const trustText = state.trust === "trusted" ? "موجودی و بدهی به‌صورت عددی نمایش داده می‌شود." : "فقط وضعیت قابل/غیرقابل پرداخت نمایش داده می‌شود.";
+      const finText = state.finalization === "after" ? "مبلغ نهایی بعد از سرویس مشخص می‌شود (authorize → capture)." : "مبلغ در checkout نهایی می‌شود.";
+      let right = "";
+      if (state.level === "0") right = `<h4>دیجی‌پی برای شما فعال نیست</h4><p>با فعال‌سازی اعتبار، پرداخت قسطی را شروع کنید.</p>${timeline()}<button class="cta red" id="applyBtn">درخواست اعتبار</button>`;
+      if (state.level === "1") right = `<h4>روش‌های پیشنهادی شما</h4><p>4pay پیشنهاد می‌شود. 1pay برای خرید سریع در دسترس است.</p>${timeline()}<button class="cta green" id="fastBtn">خرید سریع با 1pay</button> <button class="cta blue" id="gotoCheckoutBtn">رفتن به checkout</button>`;
+      if (state.level === "2") right = `<h4>اعتبار قفل است</h4><p>ابتدا بدهی را تسویه کنید، سپس خرید اعتباری ادامه می‌یابد.</p>${timeline()}<button class="cta red" id="repayBtn">تسویه بدهی</button> <button class="cta" id="walletBtn">پرداخت با کیف پول</button>`;
+      return `${tags()}<div class="grid2"><div class="box"><h4>جزئیات محصول</h4><p>Samsung Galaxy A55 - 18,500,000</p><p>${trustText}</p><p>${finText}</p><button class="cta amber" id="addToCartBtn">افزودن به سبد</button></div><div class="box">${right}</div></div>`;
+    }
+
+    function renderPLP(){
+      const banner = state.level === "0" ? "الان اعتبار بگیر و اقساطی خرید کن" : state.level === "1" ? "روش‌های پرداخت شما فعال است" : "برای خرید اعتباری ابتدا بدهی را تسویه کن";
+      return `${tags()}<div class="box"><h4>بنر BNPL</h4><p>${banner}</p>${state.level==="0"?'<button class="cta red" id="applyBtn">درخواست اعتبار</button>':state.level==="2"?'<button class="cta red" id="repayBtn">تسویه بدهی</button>':'<button class="cta blue" id="managePayBtn">مدیریت روش پرداخت</button>'}</div>
+      <div class="cards">
+        <div class="card" data-card="1">محصول ۱<br/>مشاهده جزئیات</div>
+        <div class="card" data-card="2">محصول ۲<br/>مشاهده جزئیات</div>
+        <div class="card" data-card="3">محصول ۳<br/>مشاهده جزئیات</div>
+        <div class="card" data-card="4">محصول ۴<br/>مشاهده جزئیات</div>
+      </div>`;
+    }
+
+    function method(name, key, extra="", locked=false){
+      const cls = `${locked?"lock":""} ${state.selectedMethod===key?"sel":""}`.trim();
+      return `<div class="method ${cls}" data-method="${key}">${name}${extra?`<br/><span style="font-size:10px;color:#6b7280">${extra}</span>`:""}</div>`;
+    }
+
+    function renderCheckout(){
+      const after = state.finalization==="after" ? `<div class="box" style="margin-bottom:8px;"><h4>حالت After-checkout</h4><p>ابتدا authorization انجام می‌شود و capture پس از مبلغ نهایی سرویس.</p></div>` : "";
+      let methods = "";
+      if (state.level === "0") {
+        methods += method("4pay - نیاز به فعال‌سازی اعتبار","fourpay","",true);
+        methods += method("1pay - نیاز به فعال‌سازی اعتبار","onepay","",true);
+      } else if (state.level === "1") {
+        methods += method("4pay (پیشنهادی)","fourpay","شفاف‌سازی مبلغ امروز + اقساط");
+        methods += method("1pay (خرید سریع)","onepay","تجربه سریع خرید");
+      } else {
+        methods += method("4pay - قفل تا زمان تسویه","fourpay","",true);
+        methods += method("1pay - قفل تا زمان تسویه","onepay","",true);
+      }
+      methods += method("Wallet","wallet","پرداخت + تکمیل با IPG");
+      methods += method("SnappPay / Tara","otherbnpl","روش جایگزین");
+      methods += method("IPG","ipg","پرداخت مستقیم بانکی");
+      return `${tags()}<div class="checkout"><div class="box"><h4>روش‌های پرداخت</h4>${after}${methods}${(state.level==="1"||state.level==="2")?timeline():""}${state.level==="0"?'<button class="cta red" id="applyBtn">درخواست اعتبار</button>':""}${state.level==="2"?'<button class="cta red" id="repayBtn">تسویه بدهی</button>':""}<button class="cta green" id="confirmBtn">تایید و پرداخت</button></div>
+      <div class="summary"><div class="row"><span>محصول</span><span>Galaxy A55</span></div><div class="row"><span>مبلغ</span><span>18,500,000</span></div><div class="row"><span>ارسال</span><span>رایگان</span></div><div class="row total"><span>جمع</span><span>18,500,000</span></div><div class="toast" id="resultMsg">برای ادامه یک روش پرداخت انتخاب کنید.</div></div></div>`;
+    }
+
+    function bindInteractions(){
+      document.querySelectorAll("[data-card]").forEach(c=>c.addEventListener("click",()=>{ state.page="pdp"; activate("pageBtns","pdp"); draw(); log("کاربر از PLP وارد PDP شد."); }));
+      document.querySelectorAll("[data-method]").forEach(m=>{
+        const locked = m.classList.contains("lock");
+        m.addEventListener("click",()=>{
+          if (locked) { log("این روش فعلاً قفل است."); return; }
+          state.selectedMethod = m.dataset.method; draw(); log(`روش پرداخت انتخاب شد: ${state.selectedMethod}`);
+        });
+      });
+      const apply = byId("applyBtn"); if (apply) apply.addEventListener("click",()=>{ state.level="1"; activate("levelBtns","1"); draw(); log("درخواست اعتبار تکمیل شد -> کاربر وارد Level 1 شد."); });
+      const repay = byId("repayBtn"); if (repay) repay.addEventListener("click",()=>{ state.level="1"; activate("levelBtns","1"); draw(); log("بدهی تسویه شد -> اعتبار باز شد (Level 1)."); });
+      const checkout = byId("gotoCheckoutBtn"); if (checkout) checkout.addEventListener("click",()=>{ state.page="checkout"; activate("pageBtns","checkout"); draw(); log("کاربر از PDP وارد checkout شد."); });
+      const fast = byId("fastBtn"); if (fast) fast.addEventListener("click",()=>{ state.page="checkout"; state.selectedMethod="onepay"; activate("pageBtns","checkout"); draw(); log("خرید سریع 1pay انتخاب شد."); });
+      const addToCart = byId("addToCartBtn"); if (addToCart) addToCart.addEventListener("click",()=>log("محصول به سبد خرید اضافه شد."));
+      const wallet = byId("walletBtn"); if (wallet) wallet.addEventListener("click",()=>{ state.page="checkout"; state.selectedMethod="wallet"; activate("pageBtns","checkout"); draw(); log("پرداخت با کیف پول انتخاب شد."); });
+      const confirm = byId("confirmBtn");
+      if (confirm) confirm.addEventListener("click",()=>{
+        const msg = byId("resultMsg");
+        if (!msg) return;
+        if (state.level==="0" && (state.selectedMethod==="fourpay"||state.selectedMethod==="onepay")) msg.textContent = "برای این روش ابتدا باید اعتبار را فعال کنید.";
+        else if (state.level==="2" && (state.selectedMethod==="fourpay"||state.selectedMethod==="onepay")) msg.textContent = "ابتدا بدهی را تسویه کنید، سپس پرداخت اعتباری ممکن می‌شود.";
+        else msg.textContent = `پرداخت با ${state.selectedMethod} انجام شد (شبیه‌سازی).`;
+      });
+    }
+
+    function activate(groupId, value){
+      document.querySelectorAll(`#${groupId} .btn`).forEach(b=>b.classList.remove("active"));
+      const btn = document.querySelector(`#${groupId} .btn[data-${groupId==="pageBtns"?"page":groupId==="levelBtns"?"level":groupId==="trustBtns"?"trust":"final"}="${value}"]`);
+      if (btn) btn.classList.add("active");
+    }
+
+    function draw(){
+      byId("title").textContent = `Final UI | ${state.page.toUpperCase()} | ${levelText()} | ${state.trust} | ${state.finalization}`;
+      const screen = byId("screen");
+      if (state.page==="pdp") screen.innerHTML = renderPDP();
+      else if (state.page==="plp") screen.innerHTML = renderPLP();
+      else screen.innerHTML = renderCheckout();
+      bindInteractions();
+    }
+
+    document.querySelectorAll("#pageBtns .btn").forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll("#pageBtns .btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); state.page=b.dataset.page; draw(); }));
+    document.querySelectorAll("#levelBtns .btn").forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll("#levelBtns .btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); state.level=b.dataset.level; draw(); }));
+    document.querySelectorAll("#trustBtns .btn").forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll("#trustBtns .btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); state.trust=b.dataset.trust; draw(); }));
+    document.querySelectorAll("#finalBtns .btn").forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll("#finalBtns .btn").forEach(x=>x.classList.remove("active")); b.classList.add("active"); state.finalization=b.dataset.final; draw(); }));
+    draw();
+  </script>
+</body>
+</html>
