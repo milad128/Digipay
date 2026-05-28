@@ -337,6 +337,8 @@
         <div class="panel-title">سرویس‌های دیجی‌پی در این صفحه</div>
         <ul class="service-list" id="serviceList"></ul>
         <button class="doc-link" id="openFinalUiBtn" type="button" style="margin-bottom:6px;background:#0f766e;">مشاهده صفحه نهایی Merchant UI</button>
+        <button class="doc-link" id="openHandbookBtn" type="button" style="margin-bottom:6px;">راهنمای محصول (Product Handbook)</button>
+        <button class="doc-link" id="openMatrixBtn" type="button" style="margin-bottom:6px;">ماتریس سرویس‌ها</button>
         <button class="doc-link" id="openDocsBtn" type="button">مشاهده مستندات کامل سرویس‌ها</button>
       </section>
     </aside>
@@ -631,6 +633,14 @@
         finalization: state.finalization
       });
       window.location.href = `./merchant-ui.html?${params.toString()}`;
+    });
+
+    document.getElementById("openHandbookBtn").addEventListener("click", () => {
+      window.location.href = "./product-discovery-handbook.html";
+    });
+
+    document.getElementById("openMatrixBtn").addEventListener("click", () => {
+      window.location.href = "./service-catalog-matrix.html";
     });
 
     renderWireframe();

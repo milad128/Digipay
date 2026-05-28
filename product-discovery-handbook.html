@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digipay B2B Discovery — Product Handbook</title>
+  <style>
+    :root {
+      --bg: #f8fafc; --card: #fff; --line: #e2e8f0; --text: #0f172a; --muted: #64748b;
+      --brand: #0ea5e9; --brand-soft: #e0f2fe; --warn: #fff7ed; --warn-b: #fed7aa;
+      --ok: #ecfdf5; --ok-b: #86efac; --purple: #eef2ff; --purple-b: #c7d2fe;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px 48px; }
+    .top { display: flex; justify-content: space-between; align-items: start; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+    h1 { font-size: 28px; margin-bottom: 6px; }
+    .sub { color: var(--muted); font-size: 14px; max-width: 720px; }
+    .nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      border: 1px solid var(--line); background: #fff; color: var(--text);
+      border-radius: 10px; padding: 8px 12px; text-decoration: none; font-size: 12px; font-weight: 600;
+    }
+    .btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .card {
+      background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+      padding: 16px; margin-bottom: 14px;
+    }
+    h2 { font-size: 20px; margin-bottom: 10px; padding-top: 8px; }
+    h3 { font-size: 15px; margin: 14px 0 8px; color: #1e293b; }
+    p, li { font-size: 13px; color: #334155; }
+    ul, ol { padding-left: 20px; margin-bottom: 8px; }
+    li { margin-bottom: 5px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 10px 0; }
+    th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #f1f5f9; font-weight: 700; }
+    .tag { display: inline-block; font-size: 10px; font-weight: 700; border-radius: 999px; padding: 3px 8px; margin: 2px 4px 2px 0; }
+    .t-l0 { background: #fff8e1; color: #8d6e00; }
+    .t-l1 { background: #e8f5e9; color: #1b5e20; }
+    .t-l2 { background: #ffebee; color: #b71c1c; }
+    .note-warn { background: var(--warn); border: 1px solid var(--warn-b); border-radius: 10px; padding: 10px; font-size: 12px; color: #9a3412; margin: 10px 0; }
+    .note-ok { background: var(--ok); border: 1px solid var(--ok-b); border-radius: 10px; padding: 10px; font-size: 12px; color: #166534; margin: 10px 0; }
+    .note-info { background: var(--purple); border: 1px solid var(--purple-b); border-radius: 10px; padding: 10px; font-size: 12px; color: #3730a3; margin: 10px 0; }
+    code { font-family: ui-monospace, monospace; font-size: 11px; background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top">
+      <div>
+        <h1>Digipay B2B Discovery — Product Handbook</h1>
+        <p class="sub">
+          Single source of truth for product managers and system designers.
+          Covers merchant segmentation, payment conventions, user levels, trust/finalization policies, UX principles, and known limitations.
+        </p>
+      </div>
+      <div class="nav-links">
+        <a class="btn" href="README.md">README</a>
+        <a class="btn" href="service-catalog-matrix.html">Service matrix</a>
+        <a class="btn" href="wireframe-morecode-fa.html">Wireframes</a>
+        <a class="btn" href="merchant-ui.html">Final UI</a>
+        <a class="btn primary" href="digipay-services-docs.html">Technical docs</a>
+      </div>
+    </div>
+
+    <section class="card">
+      <h2>1. Discovery scope</h2>
+      <p>
+        Digipay is a BNPL provider in Iran. This discovery defines how merchants integrate Digipay credit products
+        (Wallet, 1pay, 4pay) into e-commerce journeys (PDP, PLP, Checkout), aligned with best practices from
+        Tabby (business/product), Klarna, Afterpay, and Stripe (merchant DX and API patterns).
+      </p>
+      <div class="note-info">
+        <strong>Current artifact status:</strong> More-code segment is fully prototyped (wireframe + final UI + docs).
+        Mid-code and Low-code segments are defined at product level here; UX prototypes are Phase 2.
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>2. Merchant segmentation</h2>
+      <p>Merchants are classified on <strong>three independent attributes</strong>. During discovery, treat each combination as a separate segment; merge only when the required service bundle is identical.</p>
+      <table>
+        <thead>
+          <tr><th>Attribute</th><th>Values</th><th>Meaning</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Development capacity</strong></td>
+            <td>More code · Mid code · Low code</td>
+            <td>How much native UI and API orchestration the merchant can build on their site.</td>
+          </tr>
+          <tr>
+            <td><strong>Trust relationship</strong></td>
+            <td>Trusted · Untrusted</td>
+            <td>
+              <strong>Trusted:</strong> Digipay returns numeric balances (1pay, 4pay, wallet, debt) for personalized UX.<br/>
+              <strong>Untrusted:</strong> Merchant sends basket amount; Digipay returns only enough / not-enough per method (no raw figures).
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Amount finalization</strong></td>
+            <td>At checkout · After checkout</td>
+            <td>
+              <strong>At checkout:</strong> Fixed basket amount (e.g. retail). Charge at confirm.<br/>
+              <strong>After checkout:</strong> Variable final amount (e.g. ride-hailing, services). Authorize → capture flow.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p><strong>Maximum segments:</strong> 3 × 2 × 2 = <strong>12</strong>. More-code has 4 sub-segments (Trusted/Untrusted × At/After) — currently prototyped.</p>
+      <table>
+        <thead>
+          <tr><th>Dev capacity</th><th>Integration pattern</th><th>Merchant examples</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>More code</strong></td><td>Native widgets on PDP/PLP/Checkout; full API orchestration</td><td>Digikala-like marketplaces</td></tr>
+          <tr><td><strong>Mid code</strong></td><td>Hosted BNPL components + limited native chrome; merchant handles cart/checkout shell</td><td>Mid-size retailers with partial eng capacity</td></tr>
+          <tr><td><strong>Low code</strong></td><td>Redirect or embedded hosted checkout; minimal API surface</td><td>Small merchants, plugins, no-code platforms</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>3. User levels (L0 / L1 / L2)</h2>
+      <p>Every page load should resolve user level first via <code>GetUserLevel</code>. UX goals differ by level:</p>
+      <table>
+        <thead>
+          <tr><th>Level</th><th>State</th><th>Primary UX goal</th><th>Allowed credit actions</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag t-l0">L0</span></td>
+            <td>No credit balance</td>
+            <td>Motivate credit application</td>
+            <td>Apply CTA; 4pay/1pay locked at checkout; wallet/IPG/competitors may still be available per policy</td>
+          </tr>
+          <tr>
+            <td><span class="tag t-l1">L1</span></td>
+            <td>Has credit, can purchase</td>
+            <td>Motivate best Digipay payment method</td>
+            <td>4pay (recommended), 1pay (fast buy), wallet; show breakdown before commit for 4pay</td>
+          </tr>
+          <tr>
+            <td><span class="tag t-l2">L2</span></td>
+            <td>Has outstanding debt</td>
+            <td>Motivate repayment, then credit purchase</td>
+            <td>4pay/1pay locked until repay; repay CTA prominent; <strong>wallet remains available</strong> (debt does not block wallet)</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="note-ok">
+        <strong>Decision (OQ-1):</strong> When a user has debt on a credit limit (L2), they <strong>can still pay with wallet</strong>. Only 1pay and 4pay stay locked until repayment.
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>4. Payment method conventions</h2>
+      <div class="grid-2">
+        <div>
+          <h3>Wallet</h3>
+          <ul>
+            <li>Debit from wallet balance + cashback rules</li>
+            <li><strong>OTP:</strong> required per policy</li>
+            <li><strong>IPG uplift:</strong> allowed when balance &lt; basket amount</li>
+            <li>Partial pay: wallet portion + IPG for remainder</li>
+          </ul>
+        </div>
+        <div>
+          <h3>1pay</h3>
+          <ul>
+            <li>Frictionless single-shot credit purchase</li>
+            <li><strong>No OTP</strong> (low friction)</li>
+            <li><strong>No IPG uplift</strong> — all-or-nothing within available 1pay balance</li>
+            <li>Ideal for “buy now” from PDP</li>
+          </ul>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:10px;">
+        <div>
+          <h3>4pay (installment credit)</h3>
+          <ul>
+            <li><strong>OTP:</strong> required</li>
+            <li><strong>IPG uplift:</strong> allowed via server formula (not simple A÷4)</li>
+            <li>Formula: <code>creditPayment = min(A, B × 0.75)</code></li>
+            <li><code>debitPayment = A − creditPayment</code> (paid via IPG upfront)</li>
+            <li>Installment schedule and due dates must come from <code>Get4PayFormulaBreakdown</code> — never client-calculated</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Competitors & fallback (all dev tiers)</h3>
+          <ul>
+            <li>Checkout must list <strong>SnappPay</strong>, <strong>Tara</strong>, and <strong>IPG</strong> alongside Digipay methods</li>
+            <li>Reduces checkout dead-ends when Digipay credit is insufficient or locked</li>
+            <li>Digipay methods should be visually prioritized when eligible (L1)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>5. Trust & finalization policies</h2>
+      <h3>Trusted merchants</h3>
+      <ul>
+        <li>Call <code>GetBalanceAndDebt</code> and <code>GetCreditHeadroom</code> for numeric personalization</li>
+        <li>Show balances on checkout method cards (1pay, 4pay, wallet) to motivate Digipay selection</li>
+        <li>Pass 4pay headroom into formula breakdown request</li>
+      </ul>
+      <h3>Untrusted merchants</h3>
+      <ul>
+        <li>Never call balance/debt endpoints</li>
+        <li>Use <code>GetEligibilityFlagsOnly</code> — merchant posts basket amount, receives enough/not-enough flags only</li>
+        <li>UX labels: “Eligible / Partial / Not eligible” — no numeric amounts</li>
+      </ul>
+      <h3>After-checkout (service merchants)</h3>
+      <ol>
+        <li><strong>AuthorizeAmount</strong> at checkout start (hold capacity, do not capture)</li>
+        <li>Service completes → final amount known</li>
+        <li><strong>CaptureFinalAmount</strong> for the <strong>full final amount</strong> (no partial capture)</li>
+        <li><strong>AdjustOrVoidAuthorization</strong> if the trip/order is canceled (void), not for charging less than authorized in increments</li>
+      </ol>
+      <div class="note-ok">
+        <strong>Decision (OQ-3):</strong> Partial capture is <strong>not required</strong>. Capture is always for the complete final amount, or void/adjust on cancel.
+      </div>
+      <div class="note-ok">
+        <strong>Decision (OQ-2):</strong> <strong>Lock at authorize</strong> — eligibility and payment method are fixed when <code>AuthorizeAmount</code> succeeds. At capture, Digipay does <strong>not</strong> re-check user level; capture proceeds if it was valid at authorize (e.g. user may become L2 during the trip but 4pay capture still completes).
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>6. Page-level UX requirements (More code — implemented)</h2>
+      <table>
+        <thead>
+          <tr><th>Page</th><th>Purpose</th><th>Key UX elements</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>PDP</strong></td>
+            <td>Convert at product detail</td>
+            <td>Level-based panel (apply / pay / repay); 4pay timeline preview; 1pay fast buy; trust-aware copy</td>
+          </tr>
+          <tr>
+            <td><strong>PLP</strong></td>
+            <td>Discovery at scale</td>
+            <td>BNPL banner by level; per-card “from X/month” teaser; batch eligibility badges</td>
+          </tr>
+          <tr>
+            <td><strong>Checkout</strong></td>
+            <td>Method selection & pay</td>
+            <td>Full method list; trusted balance motivation; 4pay breakdown on select; OTP/IPG flows; after-checkout banner</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>See <a href="wireframe-morecode-fa.html">wireframe-morecode-fa.html</a> (low-fi) and <a href="merchant-ui.html">merchant-ui.html</a> (interactive final UI).</p>
+    </section>
+
+    <section class="card">
+      <h2>7. Design principles & limitations</h2>
+      <div class="note-ok">
+        <strong>Do</strong>
+        <ul style="margin-top:6px;">
+          <li>Server-authoritative pricing, installments, and due dates</li>
+          <li>Transparent installment breakdown <em>before</em> payment commitment (Klarna-style)</li>
+          <li>Strong level-based CTAs with clear next action (Afterpay-style)</li>
+          <li>Idempotent checkout sessions; recoverable after refresh</li>
+          <li>Webhook as source of truth for order state</li>
+        </ul>
+      </div>
+      <div class="note-warn">
+        <strong>Don’t</strong>
+        <ul style="margin-top:6px;">
+          <li>Calculate 4pay splits as A÷4 on the client</li>
+          <li>Expose numeric balances to untrusted merchants</li>
+          <li>Capture before final amount is known (after-checkout segments)</li>
+          <li>Hide competitor BNPL/IPG at checkout (conversion safety)</li>
+          <li>Allow 1pay when balance &lt; basket (no uplift path)</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>8. Segment merge guidance (post-discovery)</h2>
+      <p>Merge segments only when <strong>all</strong> of the following match:</p>
+      <ul>
+        <li>Same API service bundle (see <a href="service-catalog-matrix.html">service catalog matrix</a>)</li>
+        <li>Same UX component set (only styling/copy may differ)</li>
+        <li>Same compliance and data-exposure rules</li>
+      </ul>
+      <table>
+        <thead>
+          <tr><th>Likely merge candidates</th><th>Rationale</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Trusted+At ↔ Trusted+After (same dev tier)</td><td>Same balance APIs; after-checkout adds authorize/capture only at checkout step</td></tr>
+          <tr><td>Untrusted+At ↔ Untrusted+After (same dev tier)</td><td>Same flags API; after-checkout adds auth/capture services</td></tr>
+          <tr><td>Mid vs Low (TBD)</td><td>May share hosted checkout bundle — validate in eng spike</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>9. Open questions register</h2>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Question</th><th>Decision</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>OQ-1</td>
+            <td>Wallet allowed at L2 (debt lock)?</td>
+            <td><strong>Yes.</strong> User with credit debt can pay with wallet. 1pay and 4pay remain locked until repay.</td>
+            <td>Resolved</td>
+          </tr>
+          <tr>
+            <td>OQ-2</td>
+            <td>At capture time, re-check user level or use level from authorize?</td>
+            <td><strong>Option A — Lock at authorize.</strong> Honor eligibility from authorize time; do not re-evaluate level at capture.</td>
+            <td>Resolved</td>
+          </tr>
+          <tr>
+            <td>OQ-3</td>
+            <td>Partial capture for after-checkout?</td>
+            <td><strong>No.</strong> Capture full final amount only; use void/adjust on cancel.</td>
+            <td>Resolved</td>
+          </tr>
+          <tr><td>OQ-4</td><td>Mid-code: hosted widget vs iframe boundaries</td><td>—</td><td>Phase 2</td></tr>
+          <tr><td>OQ-5</td><td>Low-code: redirect-only vs embedded hosted checkout</td><td>—</td><td>Phase 2</td></tr>
+        </tbody>
+      </table>
+
+      <h3>OQ-2 reference (resolved: Option A)</h3>
+      <p>
+        For <strong>after-checkout</strong> flows, user level may change between authorize and capture (e.g. L1 → L2 mid-trip).
+        <strong>Chosen policy:</strong> eligibility is locked at authorize; capture does not call <code>GetUserLevel</code> again for method eligibility.
+        Engineering must persist <code>authorizedLevel</code>, <code>authorizedMethod</code>, and eligibility snapshot on the checkout session.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>10. Related artifacts</h2>
+      <table>
+        <thead><tr><th>Artifact</th><th>Audience</th><th>Link</th></tr></thead>
+        <tbody>
+          <tr><td>Low-fi wireframes (More code, FA)</td><td>Design, PM</td><td><a href="wireframe-morecode-fa.html">wireframe-morecode-fa.html</a></td></tr>
+          <tr><td>Final interactive UI</td><td>PM, stakeholders</td><td><a href="merchant-ui.html">merchant-ui.html</a></td></tr>
+          <tr><td>Service catalog matrix</td><td>PM, Eng</td><td><a href="service-catalog-matrix.html">service-catalog-matrix.html</a></td></tr>
+          <tr><td>Technical integration docs</td><td>Engineering</td><td><a href="digipay-services-docs.html">digipay-services-docs.html</a></td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</body>
+</html>

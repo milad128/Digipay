@@ -194,7 +194,11 @@
           This document includes service catalog, API contracts, UX usage, implementation sequence, and product notes.
         </p>
       </div>
-      <a class="btn" href="wireframe-morecode-fa.html">← Back to wireframe</a>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <a class="btn" href="product-discovery-handbook.html">Product handbook</a>
+        <a class="btn" href="service-catalog-matrix.html">Service matrix</a>
+        <a class="btn" href="wireframe-morecode-fa.html">← Wireframe</a>
+      </div>
     </div>
 
     <div class="layout">
@@ -399,6 +403,8 @@
           <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/checkout/sessions/{id}/authorize</code></span></div>
           <div class="kv"><strong>Purpose</strong><span>Reserve payment capacity before final amount is known (service use cases).</span></div>
           <div class="kv"><strong>Best practice</strong><span>Never capture at this step; capture only after final amount settlement.</span></div>
+          <div class="kv"><strong>Eligibility lock (OQ-2)</strong><span>Persist <code>authorizedLevel</code>, <code>authorizedMethod</code>, and eligibility snapshot on the session. This snapshot is the source of truth for capture.</span></div>
+          <div class="pm-note">PM note: Option A — if user was L1 with 4pay at authorize, capture proceeds even if they become L2 before trip ends.</div>
         </section>
 
         <section class="service">
@@ -407,7 +413,9 @@
           </div>
           <div class="kv"><strong>Endpoint</strong><span><code>POST /v1/checkout/sessions/{id}/capture</code></span></div>
           <div class="kv"><strong>Purpose</strong><span>Capture the exact final amount after service completion.</span></div>
-          <div class="kv"><strong>Rule</strong><span>Validate captured amount against authorization policy and risk controls.</span></div>
+          <div class="kv"><strong>Rule</strong><span>Validate captured amount against authorization policy and risk controls. Full amount only — no partial capture (OQ-3).</span></div>
+          <div class="kv"><strong>Eligibility (OQ-2)</strong><span>Do <strong>not</strong> re-call <code>GetUserLevel</code> for method eligibility. Use authorize-time snapshot only.</span></div>
+          <div class="eng-note">Engineering: reject capture if final amount exceeds authorized ceiling; void via AdjustOrVoidAuthorization on cancel.</div>
         </section>
 
         <section class="service">
